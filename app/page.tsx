@@ -1,14 +1,15 @@
-import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { auth } from '@/core/lib/auth'
+import { headers } from 'next/headers'
 
-export default function Home() {
-  return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-      <h1 className="text-4xl font-bold tracking-tight">Planimo</h1>
-      <p className="text-muted-foreground">Gestion locative simplifiée</p>
-      <div className="flex gap-4">
-        <Link href="/login" className="underline">Se connecter</Link>
-        <Link href="/register" className="underline">S&apos;inscrire</Link>
-      </div>
-    </main>
-  )
+export default async function HomePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (session) {
+    redirect('/dashboard')
+  } else {
+    redirect('/login')
+  }
 }

@@ -1,20 +1,12 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
 import './globals.css'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
+import { ThemeProvider } from '@/core/components/shared/theme-provider'
 
 export const metadata: Metadata = {
-  title: 'Planimo — Gestion locative',
-  description: 'Application SaaS de gestion locative',
+  title: 'Planimo — Gestion locative intelligente',
+  description: 'Gérez vos biens immobiliers avec un plan interactif segmenté par IA',
 }
 
 export default function RootLayout({
@@ -23,8 +15,21 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html
+      lang="fr"
+      className={`${GeistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className={`${GeistSans.className} min-h-full flex flex-col`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
