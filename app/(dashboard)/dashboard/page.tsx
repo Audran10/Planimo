@@ -16,6 +16,9 @@ import {
 import { Card, CardContent, CardHeader } from '@/core/components/ui/card'
 import { Button } from '@/core/components/ui/button'
 import { getProperties } from '@/features/properties/actions/properties'
+import { getAllTenants } from '@/features/tenants/actions/tenants'
+import { isTenantActive } from '@/features/tenants/lib/tenant-status'
+import { getAllDocuments } from '@/features/documents/actions/documents'
 
 const quickActions = [
   { label: 'Ajouter un bien', icon: Plus, href: '/properties' },
@@ -73,6 +76,11 @@ export default async function DashboardPage() {
   const properties = await getProperties()
   const unitsCount = properties.reduce((sum, p) => sum + p.unitsCount, 0)
 
+  const tenants = await getAllTenants()
+  const activeTenantsCount = tenants.filter(isTenantActive).length
+
+  const documents = await getAllDocuments()
+
   const stats: StatItem[] = [
     {
       label: 'Biens',
@@ -89,14 +97,14 @@ export default async function DashboardPage() {
     },
     {
       label: 'Locataires',
-      value: 0,
+      value: activeTenantsCount,
       icon: Users,
       hint: 'Ajouter un locataire',
       href: '/tenants',
     },
     {
       label: 'Documents',
-      value: 0,
+      value: documents.length,
       icon: FileText,
       hint: 'Importer un document',
       href: '/documents',
