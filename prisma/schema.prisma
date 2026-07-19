@@ -70,6 +70,7 @@ model Property {
   id          String   @id @default(cuid())
   ownerId     String
   name        String
+  slug        String   @unique
   address     String
   type        String   @default("apartment_building")
   description String?
@@ -102,6 +103,7 @@ model Unit {
   id             String    @id @default(cuid())
   propertyId     String
   name           String
+  slug           String    @unique
   floor          Int?
   surface        Float?
   floorPlanUrl   String?   // URL Supabase Storage du plan uploadé

@@ -40,6 +40,7 @@ export type UnitMinAggregateOutputType = {
   id: string | null
   propertyId: string | null
   name: string | null
+  slug: string | null
   floor: number | null
   surface: number | null
   floorPlanUrl: string | null
@@ -51,6 +52,7 @@ export type UnitMaxAggregateOutputType = {
   id: string | null
   propertyId: string | null
   name: string | null
+  slug: string | null
   floor: number | null
   surface: number | null
   floorPlanUrl: string | null
@@ -62,6 +64,7 @@ export type UnitCountAggregateOutputType = {
   id: number
   propertyId: number
   name: number
+  slug: number
   floor: number
   surface: number
   floorPlanUrl: number
@@ -86,6 +89,7 @@ export type UnitMinAggregateInputType = {
   id?: true
   propertyId?: true
   name?: true
+  slug?: true
   floor?: true
   surface?: true
   floorPlanUrl?: true
@@ -97,6 +101,7 @@ export type UnitMaxAggregateInputType = {
   id?: true
   propertyId?: true
   name?: true
+  slug?: true
   floor?: true
   surface?: true
   floorPlanUrl?: true
@@ -108,6 +113,7 @@ export type UnitCountAggregateInputType = {
   id?: true
   propertyId?: true
   name?: true
+  slug?: true
   floor?: true
   surface?: true
   floorPlanUrl?: true
@@ -207,6 +213,7 @@ export type UnitGroupByOutputType = {
   id: string
   propertyId: string
   name: string
+  slug: string
   floor: number | null
   surface: number | null
   floorPlanUrl: string | null
@@ -242,6 +249,7 @@ export type UnitWhereInput = {
   id?: Prisma.StringFilter<"Unit"> | string
   propertyId?: Prisma.StringFilter<"Unit"> | string
   name?: Prisma.StringFilter<"Unit"> | string
+  slug?: Prisma.StringFilter<"Unit"> | string
   floor?: Prisma.IntNullableFilter<"Unit"> | number | null
   surface?: Prisma.FloatNullableFilter<"Unit"> | number | null
   floorPlanUrl?: Prisma.StringNullableFilter<"Unit"> | string | null
@@ -259,6 +267,7 @@ export type UnitOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   propertyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   floor?: Prisma.SortOrderInput | Prisma.SortOrder
   surface?: Prisma.SortOrderInput | Prisma.SortOrder
   floorPlanUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -274,6 +283,7 @@ export type UnitOrderByWithRelationInput = {
 
 export type UnitWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.UnitWhereInput | Prisma.UnitWhereInput[]
   OR?: Prisma.UnitWhereInput[]
   NOT?: Prisma.UnitWhereInput | Prisma.UnitWhereInput[]
@@ -290,12 +300,13 @@ export type UnitWhereUniqueInput = Prisma.AtLeast<{
   tenants?: Prisma.TenantListRelationFilter
   documents?: Prisma.DocumentListRelationFilter
   workOrders?: Prisma.WorkOrderListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type UnitOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   propertyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   floor?: Prisma.SortOrderInput | Prisma.SortOrder
   surface?: Prisma.SortOrderInput | Prisma.SortOrder
   floorPlanUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -316,6 +327,7 @@ export type UnitScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Unit"> | string
   propertyId?: Prisma.StringWithAggregatesFilter<"Unit"> | string
   name?: Prisma.StringWithAggregatesFilter<"Unit"> | string
+  slug?: Prisma.StringWithAggregatesFilter<"Unit"> | string
   floor?: Prisma.IntNullableWithAggregatesFilter<"Unit"> | number | null
   surface?: Prisma.FloatNullableWithAggregatesFilter<"Unit"> | number | null
   floorPlanUrl?: Prisma.StringNullableWithAggregatesFilter<"Unit"> | string | null
@@ -327,6 +339,7 @@ export type UnitScalarWhereWithAggregatesInput = {
 export type UnitCreateInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -344,6 +357,7 @@ export type UnitUncheckedCreateInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -359,6 +373,7 @@ export type UnitUncheckedCreateInput = {
 export type UnitUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -376,6 +391,7 @@ export type UnitUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -392,6 +408,7 @@ export type UnitCreateManyInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -403,6 +420,7 @@ export type UnitCreateManyInput = {
 export type UnitUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -415,6 +433,7 @@ export type UnitUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -437,6 +456,7 @@ export type UnitCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   propertyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   floor?: Prisma.SortOrder
   surface?: Prisma.SortOrder
   floorPlanUrl?: Prisma.SortOrder
@@ -454,6 +474,7 @@ export type UnitMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   propertyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   floor?: Prisma.SortOrder
   surface?: Prisma.SortOrder
   floorPlanUrl?: Prisma.SortOrder
@@ -465,6 +486,7 @@ export type UnitMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   propertyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   floor?: Prisma.SortOrder
   surface?: Prisma.SortOrder
   floorPlanUrl?: Prisma.SortOrder
@@ -608,6 +630,7 @@ export type UnitUpdateOneWithoutWorkOrdersNestedInput = {
 export type UnitCreateWithoutPropertyInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -623,6 +646,7 @@ export type UnitCreateWithoutPropertyInput = {
 export type UnitUncheckedCreateWithoutPropertyInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -668,6 +692,7 @@ export type UnitScalarWhereInput = {
   id?: Prisma.StringFilter<"Unit"> | string
   propertyId?: Prisma.StringFilter<"Unit"> | string
   name?: Prisma.StringFilter<"Unit"> | string
+  slug?: Prisma.StringFilter<"Unit"> | string
   floor?: Prisma.IntNullableFilter<"Unit"> | number | null
   surface?: Prisma.FloatNullableFilter<"Unit"> | number | null
   floorPlanUrl?: Prisma.StringNullableFilter<"Unit"> | string | null
@@ -679,6 +704,7 @@ export type UnitScalarWhereInput = {
 export type UnitCreateWithoutRoomsInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -695,6 +721,7 @@ export type UnitUncheckedCreateWithoutRoomsInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -725,6 +752,7 @@ export type UnitUpdateToOneWithWhereWithoutRoomsInput = {
 export type UnitUpdateWithoutRoomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -741,6 +769,7 @@ export type UnitUncheckedUpdateWithoutRoomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -755,6 +784,7 @@ export type UnitUncheckedUpdateWithoutRoomsInput = {
 export type UnitCreateWithoutTenantsInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -771,6 +801,7 @@ export type UnitUncheckedCreateWithoutTenantsInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -801,6 +832,7 @@ export type UnitUpdateToOneWithWhereWithoutTenantsInput = {
 export type UnitUpdateWithoutTenantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -817,6 +849,7 @@ export type UnitUncheckedUpdateWithoutTenantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -831,6 +864,7 @@ export type UnitUncheckedUpdateWithoutTenantsInput = {
 export type UnitCreateWithoutDocumentsInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -847,6 +881,7 @@ export type UnitUncheckedCreateWithoutDocumentsInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -877,6 +912,7 @@ export type UnitUpdateToOneWithWhereWithoutDocumentsInput = {
 export type UnitUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -893,6 +929,7 @@ export type UnitUncheckedUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -907,6 +944,7 @@ export type UnitUncheckedUpdateWithoutDocumentsInput = {
 export type UnitCreateWithoutWorkOrdersInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -923,6 +961,7 @@ export type UnitUncheckedCreateWithoutWorkOrdersInput = {
   id?: string
   propertyId: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -953,6 +992,7 @@ export type UnitUpdateToOneWithWhereWithoutWorkOrdersInput = {
 export type UnitUpdateWithoutWorkOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -969,6 +1009,7 @@ export type UnitUncheckedUpdateWithoutWorkOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   propertyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -983,6 +1024,7 @@ export type UnitUncheckedUpdateWithoutWorkOrdersInput = {
 export type UnitCreateManyPropertyInput = {
   id?: string
   name: string
+  slug: string
   floor?: number | null
   surface?: number | null
   floorPlanUrl?: string | null
@@ -994,6 +1036,7 @@ export type UnitCreateManyPropertyInput = {
 export type UnitUpdateWithoutPropertyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1009,6 +1052,7 @@ export type UnitUpdateWithoutPropertyInput = {
 export type UnitUncheckedUpdateWithoutPropertyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1024,6 +1068,7 @@ export type UnitUncheckedUpdateWithoutPropertyInput = {
 export type UnitUncheckedUpdateManyWithoutPropertyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   surface?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   floorPlanUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1094,6 +1139,7 @@ export type UnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   propertyId?: boolean
   name?: boolean
+  slug?: boolean
   floor?: boolean
   surface?: boolean
   floorPlanUrl?: boolean
@@ -1112,6 +1158,7 @@ export type UnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   propertyId?: boolean
   name?: boolean
+  slug?: boolean
   floor?: boolean
   surface?: boolean
   floorPlanUrl?: boolean
@@ -1125,6 +1172,7 @@ export type UnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   propertyId?: boolean
   name?: boolean
+  slug?: boolean
   floor?: boolean
   surface?: boolean
   floorPlanUrl?: boolean
@@ -1138,6 +1186,7 @@ export type UnitSelectScalar = {
   id?: boolean
   propertyId?: boolean
   name?: boolean
+  slug?: boolean
   floor?: boolean
   surface?: boolean
   floorPlanUrl?: boolean
@@ -1146,7 +1195,7 @@ export type UnitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "propertyId" | "name" | "floor" | "surface" | "floorPlanUrl" | "floorPlanZones" | "createdAt" | "updatedAt", ExtArgs["result"]["unit"]>
+export type UnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "propertyId" | "name" | "slug" | "floor" | "surface" | "floorPlanUrl" | "floorPlanZones" | "createdAt" | "updatedAt", ExtArgs["result"]["unit"]>
 export type UnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   property?: boolean | Prisma.PropertyDefaultArgs<ExtArgs>
   rooms?: boolean | Prisma.Unit$roomsArgs<ExtArgs>
@@ -1175,6 +1224,7 @@ export type $UnitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     propertyId: string
     name: string
+    slug: string
     floor: number | null
     surface: number | null
     floorPlanUrl: string | null
@@ -1612,6 +1662,7 @@ export interface UnitFieldRefs {
   readonly id: Prisma.FieldRef<"Unit", 'String'>
   readonly propertyId: Prisma.FieldRef<"Unit", 'String'>
   readonly name: Prisma.FieldRef<"Unit", 'String'>
+  readonly slug: Prisma.FieldRef<"Unit", 'String'>
   readonly floor: Prisma.FieldRef<"Unit", 'Int'>
   readonly surface: Prisma.FieldRef<"Unit", 'Float'>
   readonly floorPlanUrl: Prisma.FieldRef<"Unit", 'String'>

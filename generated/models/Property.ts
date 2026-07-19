@@ -28,6 +28,7 @@ export type PropertyMinAggregateOutputType = {
   id: string | null
   ownerId: string | null
   name: string | null
+  slug: string | null
   address: string | null
   type: string | null
   description: string | null
@@ -39,6 +40,7 @@ export type PropertyMaxAggregateOutputType = {
   id: string | null
   ownerId: string | null
   name: string | null
+  slug: string | null
   address: string | null
   type: string | null
   description: string | null
@@ -50,6 +52,7 @@ export type PropertyCountAggregateOutputType = {
   id: number
   ownerId: number
   name: number
+  slug: number
   address: number
   type: number
   description: number
@@ -63,6 +66,7 @@ export type PropertyMinAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   address?: true
   type?: true
   description?: true
@@ -74,6 +78,7 @@ export type PropertyMaxAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   address?: true
   type?: true
   description?: true
@@ -85,6 +90,7 @@ export type PropertyCountAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   address?: true
   type?: true
   description?: true
@@ -169,6 +175,7 @@ export type PropertyGroupByOutputType = {
   id: string
   ownerId: string
   name: string
+  slug: string
   address: string
   type: string
   description: string | null
@@ -201,6 +208,7 @@ export type PropertyWhereInput = {
   id?: Prisma.StringFilter<"Property"> | string
   ownerId?: Prisma.StringFilter<"Property"> | string
   name?: Prisma.StringFilter<"Property"> | string
+  slug?: Prisma.StringFilter<"Property"> | string
   address?: Prisma.StringFilter<"Property"> | string
   type?: Prisma.StringFilter<"Property"> | string
   description?: Prisma.StringNullableFilter<"Property"> | string | null
@@ -215,6 +223,7 @@ export type PropertyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
   type?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -227,6 +236,7 @@ export type PropertyOrderByWithRelationInput = {
 
 export type PropertyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.PropertyWhereInput | Prisma.PropertyWhereInput[]
   OR?: Prisma.PropertyWhereInput[]
   NOT?: Prisma.PropertyWhereInput | Prisma.PropertyWhereInput[]
@@ -240,12 +250,13 @@ export type PropertyWhereUniqueInput = Prisma.AtLeast<{
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.PropertyMemberListRelationFilter
   units?: Prisma.UnitListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type PropertyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
   type?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -263,6 +274,7 @@ export type PropertyScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Property"> | string
   ownerId?: Prisma.StringWithAggregatesFilter<"Property"> | string
   name?: Prisma.StringWithAggregatesFilter<"Property"> | string
+  slug?: Prisma.StringWithAggregatesFilter<"Property"> | string
   address?: Prisma.StringWithAggregatesFilter<"Property"> | string
   type?: Prisma.StringWithAggregatesFilter<"Property"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Property"> | string | null
@@ -273,6 +285,7 @@ export type PropertyScalarWhereWithAggregatesInput = {
 export type PropertyCreateInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -287,6 +300,7 @@ export type PropertyUncheckedCreateInput = {
   id?: string
   ownerId: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -299,6 +313,7 @@ export type PropertyUncheckedCreateInput = {
 export type PropertyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -313,6 +328,7 @@ export type PropertyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -326,6 +342,7 @@ export type PropertyCreateManyInput = {
   id?: string
   ownerId: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -336,6 +353,7 @@ export type PropertyCreateManyInput = {
 export type PropertyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -347,6 +365,7 @@ export type PropertyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -368,6 +387,7 @@ export type PropertyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -379,6 +399,7 @@ export type PropertyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -390,6 +411,7 @@ export type PropertyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -475,6 +497,7 @@ export type PropertyUpdateOneRequiredWithoutUnitsNestedInput = {
 export type PropertyCreateWithoutOwnerInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -487,6 +510,7 @@ export type PropertyCreateWithoutOwnerInput = {
 export type PropertyUncheckedCreateWithoutOwnerInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -529,6 +553,7 @@ export type PropertyScalarWhereInput = {
   id?: Prisma.StringFilter<"Property"> | string
   ownerId?: Prisma.StringFilter<"Property"> | string
   name?: Prisma.StringFilter<"Property"> | string
+  slug?: Prisma.StringFilter<"Property"> | string
   address?: Prisma.StringFilter<"Property"> | string
   type?: Prisma.StringFilter<"Property"> | string
   description?: Prisma.StringNullableFilter<"Property"> | string | null
@@ -539,6 +564,7 @@ export type PropertyScalarWhereInput = {
 export type PropertyCreateWithoutMembersInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -552,6 +578,7 @@ export type PropertyUncheckedCreateWithoutMembersInput = {
   id?: string
   ownerId: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -579,6 +606,7 @@ export type PropertyUpdateToOneWithWhereWithoutMembersInput = {
 export type PropertyUpdateWithoutMembersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -592,6 +620,7 @@ export type PropertyUncheckedUpdateWithoutMembersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -603,6 +632,7 @@ export type PropertyUncheckedUpdateWithoutMembersInput = {
 export type PropertyCreateWithoutUnitsInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -616,6 +646,7 @@ export type PropertyUncheckedCreateWithoutUnitsInput = {
   id?: string
   ownerId: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -643,6 +674,7 @@ export type PropertyUpdateToOneWithWhereWithoutUnitsInput = {
 export type PropertyUpdateWithoutUnitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -656,6 +688,7 @@ export type PropertyUncheckedUpdateWithoutUnitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -667,6 +700,7 @@ export type PropertyUncheckedUpdateWithoutUnitsInput = {
 export type PropertyCreateManyOwnerInput = {
   id?: string
   name: string
+  slug: string
   address: string
   type?: string
   description?: string | null
@@ -677,6 +711,7 @@ export type PropertyCreateManyOwnerInput = {
 export type PropertyUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -689,6 +724,7 @@ export type PropertyUpdateWithoutOwnerInput = {
 export type PropertyUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -701,6 +737,7 @@ export type PropertyUncheckedUpdateWithoutOwnerInput = {
 export type PropertyUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -752,6 +789,7 @@ export type PropertySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   address?: boolean
   type?: boolean
   description?: boolean
@@ -767,6 +805,7 @@ export type PropertySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   address?: boolean
   type?: boolean
   description?: boolean
@@ -779,6 +818,7 @@ export type PropertySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   address?: boolean
   type?: boolean
   description?: boolean
@@ -791,6 +831,7 @@ export type PropertySelectScalar = {
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   address?: boolean
   type?: boolean
   description?: boolean
@@ -798,7 +839,7 @@ export type PropertySelectScalar = {
   updatedAt?: boolean
 }
 
-export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "address" | "type" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["property"]>
+export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "slug" | "address" | "type" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["property"]>
 export type PropertyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Property$membersArgs<ExtArgs>
@@ -823,6 +864,7 @@ export type $PropertyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     ownerId: string
     name: string
+    slug: string
     address: string
     type: string
     description: string | null
@@ -1257,6 +1299,7 @@ export interface PropertyFieldRefs {
   readonly id: Prisma.FieldRef<"Property", 'String'>
   readonly ownerId: Prisma.FieldRef<"Property", 'String'>
   readonly name: Prisma.FieldRef<"Property", 'String'>
+  readonly slug: Prisma.FieldRef<"Property", 'String'>
   readonly address: Prisma.FieldRef<"Property", 'String'>
   readonly type: Prisma.FieldRef<"Property", 'String'>
   readonly description: Prisma.FieldRef<"Property", 'String'>

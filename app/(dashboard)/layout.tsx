@@ -1,12 +1,9 @@
+import { DashboardShell } from '@/features/dashboard/components/dashboard-shell'
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 border-r" />
-      <main className="flex-1 p-6">{children}</main>
-    </div>
-  )
+  return <DashboardShell>{children}</DashboardShell>
 }
