@@ -24,3 +24,11 @@ export interface CreateDocumentInput {
   roomId?: string
   tenantId?: string
 }
+
+export interface DocumentListItem extends Document {
+  propertyName: string
+  propertySlug: string
+  unitName: string | null
+  unitSlug: string | null
+}
+

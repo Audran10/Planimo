@@ -1,5 +1,6 @@
-import type { DocumentType, FloorPlanZone, PropertyType, WorkOrderStatus } from '@/core/types'
+import type { FloorPlanZone, PropertyType, WorkOrderStatus } from '@/core/types'
 import type { PropertyRole } from '@/features/properties/types'
+import type { Document } from '@/features/documents/types'
 
 export interface Unit {
   id: string
@@ -39,16 +40,6 @@ export interface UnitTenant {
   deposit?: number | null
 }
 
-export interface UnitDocument {
-  id: string
-  name: string
-  fileUrl: string
-  fileType: string
-  fileSize?: number | null
-  type: DocumentType
-  createdAt: Date
-}
-
 export interface UnitWorkOrder {
   id: string
   description: string
@@ -68,7 +59,7 @@ export interface UnitDetail extends Unit {
   }
   rooms: UnitRoom[]
   tenants: UnitTenant[]
-  documents: UnitDocument[]
+  documents: Document[]
   workOrders: UnitWorkOrder[]
   role: PropertyRole
 }

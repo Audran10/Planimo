@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Développement local
+
+### Prérequis
+
+- Node.js >= 20.9.0
+- pnpm
+- Docker Desktop
+
+### Installation
+
+1. Clone le repo
+2. Installe les dépendances : `pnpm install`
+3. Copie les variables d'environnement : `cp .env.example .env.development`
+4. Lance la base de données : `pnpm db:start`
+5. Lance les migrations : `pnpm prisma migrate dev`
+6. Lance le serveur : `pnpm dev`
+
+### Reset de la base de données
+
+```bash
+pnpm db:reset
+```
+
+### Arrêter la base de données
+
+```bash
+pnpm db:stop
+```
