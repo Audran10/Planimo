@@ -6,6 +6,17 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        '.next/',
+        'generated/',
+        '**/*.config.*',
+        '**/types/**',
+      ],
+    },
   },
   resolve: {
     alias: {

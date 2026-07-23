@@ -10,7 +10,10 @@
     "db:start": "docker-compose up -d",
     "db:stop": "docker-compose down",
     "db:reset": "docker-compose down -v && docker-compose up -d && pnpm prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "vitest",
+    "test:ci": "vitest run --coverage",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.3",
