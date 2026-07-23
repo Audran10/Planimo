@@ -1,4 +1,4 @@
-import type { FloorPlanZone, PropertyType, WorkOrderStatus } from '@/core/types'
+import type { FloorPlanZone, PropertyType } from '@/core/types'
 import type { PropertyRole } from '@/features/properties/types'
 import type { Document } from '@/features/documents/types'
 
@@ -28,6 +28,33 @@ export interface UnitRoom {
   updatedAt: Date
 }
 
+export interface RoomTechnicalInfo {
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  paintRef?: string
+  dimensions?: string
+  notes?: string
+}
+
+export interface RoomWithMeta {
+  id: string
+  unitId: string
+  name: string
+  slug: string
+  zoneCoordinates: RoomTechnicalInfo | null
+  createdAt: Date
+  updatedAt: Date
+  documentsCount: number
+  workOrdersCount: number
+}
+
+export interface UpdateRoomInput {
+  name?: string
+  zoneCoordinates?: Partial<RoomTechnicalInfo>
+}
+
 export interface UnitTenant {
   id: string
   unitId: string
@@ -40,16 +67,6 @@ export interface UnitTenant {
   deposit?: number | null
 }
 
-export interface UnitWorkOrder {
-  id: string
-  description: string
-  contractor?: string | null
-  amount?: number | null
-  interventionDate?: Date | null
-  status: WorkOrderStatus
-  createdAt: Date
-}
-
 export interface UnitDetail extends Unit {
   property: {
     id: string
@@ -60,7 +77,6 @@ export interface UnitDetail extends Unit {
   rooms: UnitRoom[]
   tenants: UnitTenant[]
   documents: Document[]
-  workOrders: UnitWorkOrder[]
   role: PropertyRole
 }
 

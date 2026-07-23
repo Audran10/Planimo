@@ -122,13 +122,16 @@ model Room {
   id              String     @id @default(cuid())
   unitId          String
   name            String
-  zoneCoordinates Json?      // { x, y, width, height } en pourcentage du plan
+  slug            String     // identifiant stable de la zone sur le plan (lié à floorPlanZones[].id)
+  zoneCoordinates Json?      // { x, y, width, height, paintRef, dimensions, notes } en pourcentage du plan
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   unit            Unit       @relation(fields: [unitId], references: [id], onDelete: Cascade)
   documents       Document[]
   workOrders      WorkOrder[]
+
+  @@unique([unitId, slug])
 }
 
 model Tenant {
