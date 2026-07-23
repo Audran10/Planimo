@@ -51,6 +51,9 @@ Better Auth est configuré avec `httpOnly: true`, `sameSite: 'lax'` et `secure` 
 
 - [`.github/dependabot.yml`](.github/dependabot.yml) : vérification hebdomadaire des dépendances npm, ouverture automatique de PR.
 - `pnpm audit --audit-level=high` dans le job `lint-and-type-check` du CI.
+- `next`, `eslint-config-next` (16.2.11), `prisma`, `@prisma/client`, `@prisma/adapter-pg` (7.9.0) mis à jour pour corriger 6 failles `high` (bypass de proxy Next.js, DoS sur les Server Actions, SSRF, PostCSS).
+- `sharp`, `postcss` et `fast-uri` forcés via `pnpm.overrides` (`package.json`) vers leurs versions patchées, car `next`/`prisma` embarquent encore en interne des versions vulnérables de ces dépendances transitives.
+- 2 failles `moderate` restantes (`@hono/node-server`, via `shadcn > @modelcontextprotocol/sdk`) : outil de développement (CLI shadcn), non présent dans le build applicatif déployé — sous le seuil `--audit-level=high` du CI, surveillées via Dependabot.
 
 ## Signaler une vulnérabilité
 
