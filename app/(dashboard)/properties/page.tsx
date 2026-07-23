@@ -21,7 +21,7 @@ export default async function PropertiesPage() {
       {properties.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-24 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-            <Building2 className="h-7 w-7 text-primary" />
+            <Building2 className="h-7 w-7 text-primary" aria-hidden="true" />
           </div>
           <div>
             <p className="font-medium">Aucun bien pour le moment</p>

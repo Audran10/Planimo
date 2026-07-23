@@ -141,6 +141,7 @@ export function UnitFormDialog({
                     <Input
                       placeholder={`${unitLabel} 1A`}
                       disabled={loading}
+                      aria-required="true"
                       {...field}
                     />
                   </FormControl>
@@ -212,7 +213,7 @@ export function UnitFormDialog({
                 Annuler
               </Button>
               <Button type="submit" className="cursor-pointer" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 {mode === 'edit' ? 'Modifier' : 'Créer'}
               </Button>
             </DialogFooter>

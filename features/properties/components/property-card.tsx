@@ -67,23 +67,23 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
         >
           <DropdownMenu>
             <DropdownMenuTrigger
+              aria-label="Options"
               render={
                 <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" />
               }
             >
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Menu</span>
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => router.push(`/properties/${property.slug}`)}
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4" aria-hidden="true" />
                 Voir
               </DropdownMenuItem>
               {canEdit && (
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" aria-hidden="true" />
                   Modifier
                 </DropdownMenuItem>
               )}
@@ -92,7 +92,7 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
                   variant="destructive"
                   onClick={() => setDeleteOpen(true)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                   Supprimer
                 </DropdownMenuItem>
               )}
@@ -102,7 +102,7 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
 
         <CardHeader>
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
+            <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
         </CardHeader>
 
@@ -110,7 +110,7 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
           <div>
             <h3 className="font-semibold">{property.name}</h3>
             <p className="flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span className="truncate">{property.address}</span>
             </p>
           </div>

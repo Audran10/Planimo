@@ -49,7 +49,7 @@ export function TenantSection({
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <UserX className="h-8 w-8 text-muted-foreground" />
+        <UserX className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">Aucun locataire</p>
         <Button
           variant="outline"

@@ -18,7 +18,7 @@ export default async function DocumentsPage() {
       {documents.length === 0 ? (
         <Card className="border border-dashed border-border">
           <CardContent className="flex flex-col items-center justify-center gap-2 py-24 text-center">
-            <FileX className="h-8 w-8 text-muted-foreground" />
+            <FileX className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
             <p className="text-sm text-muted-foreground">
               Aucun document pour le moment
             </p>

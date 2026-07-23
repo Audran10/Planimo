@@ -56,7 +56,7 @@ export function UnitDetailActions({ unit }: { unit: UnitDetail }) {
           className="cursor-pointer gap-2"
           onClick={() => setEditOpen(true)}
         >
-          <Pencil className="h-4 w-4" />
+          <Pencil className="h-4 w-4" aria-hidden="true" />
           Modifier
         </Button>
       )}
@@ -66,7 +66,7 @@ export function UnitDetailActions({ unit }: { unit: UnitDetail }) {
           className="cursor-pointer gap-2 text-destructive hover:text-destructive"
           onClick={() => setDeleteOpen(true)}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-4 w-4" aria-hidden="true" />
           Supprimer
         </Button>
       )}

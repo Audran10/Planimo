@@ -44,7 +44,7 @@ function SidebarNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="flex-1 space-y-1 px-3">
+    <nav aria-label="Navigation principale" className="flex-1 space-y-1 px-3">
       {navItems.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -53,6 +53,7 @@ function SidebarNav() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive ? 'page' : undefined}
             className={cn(
               'flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all duration-200',
               isActive
@@ -60,7 +61,7 @@ function SidebarNav() {
                 : 'rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground'
             )}
           >
-            <item.icon className="h-4 w-4" />
+            <item.icon className="h-4 w-4" aria-hidden="true" />
             {item.label}
           </Link>
         )
@@ -104,7 +105,7 @@ function SidebarFooter() {
           className="flex-1 justify-start gap-1 cursor-pointer text-muted-foreground transition-all duration-200 hover:text-destructive"
           onClick={handleSignOut}
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4" aria-hidden="true" />
           Déconnexion
         </Button>
         <ThemeToggle />

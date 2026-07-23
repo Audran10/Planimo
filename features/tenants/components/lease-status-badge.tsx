@@ -18,9 +18,9 @@ function LeaseStatusIcon({
   icon: LeaseStatusIconName
   className?: string
 }) {
-  if (icon === 'XCircle') return <XCircle className={className} />
-  if (icon === 'AlertCircle') return <AlertCircle className={className} />
-  return <FileCheck className={className} />
+  if (icon === 'XCircle') return <XCircle className={className} aria-hidden="true" />
+  if (icon === 'AlertCircle') return <AlertCircle className={className} aria-hidden="true" />
+  return <FileCheck className={className} aria-hidden="true" />
 }
 
 export function LeaseStatusBadge({

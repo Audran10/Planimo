@@ -91,16 +91,16 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
         <div className="absolute top-3 right-3">
           <DropdownMenu>
             <DropdownMenuTrigger
+              aria-label="Options"
               render={
                 <Button variant="ghost" size="icon-sm" className="cursor-pointer" />
               }
             >
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Menu</span>
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-4 w-4" aria-hidden="true" />
                 Modifier
               </DropdownMenuItem>
               {workOrder.status === 'pending' && (
@@ -124,7 +124,7 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
                 variant="destructive"
                 onClick={() => setDeleteOpen(true)}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
                 Supprimer
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -133,7 +133,7 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
 
         <div className="flex items-start gap-3 pr-10">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Wrench className="h-4 w-4 text-primary" />
+            <Wrench className="h-4 w-4 text-primary" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
@@ -144,13 +144,13 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
             </div>
             {workOrder.contractor && (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Building2 className="h-3.5 w-3.5 shrink-0" />
+                <Building2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {workOrder.contractor}
               </p>
             )}
             {workOrder.amount != null && (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Euro className="h-3.5 w-3.5 shrink-0" />
+                <Euro className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {amountFormatter.format(workOrder.amount)} €
               </p>
             )}
