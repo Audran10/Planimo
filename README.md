@@ -63,3 +63,31 @@ pnpm db:reset
 ```bash
 pnpm db:stop
 ```
+
+## CI/CD & Déploiement
+
+### Secrets GitHub requis
+
+Pour que le job `deploy` du workflow (`.github/workflows/ci.yml`) puisse déployer sur Vercel, ajoute ces secrets dans **GitHub → Settings → Secrets and variables → Actions** :
+
+| Secret | Où le récupérer |
+| --- | --- |
+| `VERCEL_TOKEN` | [vercel.com](https://vercel.com) → Settings → Tokens |
+| `VERCEL_ORG_ID` | vercel.com → Settings → General |
+| `VERCEL_PROJECT_ID` | Récupéré après création du projet sur Vercel (Project Settings → General) |
+
+Le job `build` a également besoin des secrets d'environnement applicatifs (`DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`) — voir `.github/workflows/ci.yml`.
+
+### Workflow complet
+
+**Développement**
+- Travail sur la branche `develop` ou une feature branch.
+- Chaque push déclenche la CI (`lint-and-type-check` + `test` + `build`).
+- Vercel crée automatiquement un *preview deployment* avec une URL temporaire.
+
+**Production**
+- Ouvrir une PR `develop` → `main`.
+- La CI doit passer (lint + tests + build) avant de merger.
+- Le merge sur `main` déclenche le job `deploy`.
+- Vercel exécute `pnpm prisma migrate deploy && pnpm prisma generate && pnpm build` (voir `vercel.json`) — les migrations en attente sont appliquées automatiquement à chaque déploiement.
+- Déploiement automatique en production.
