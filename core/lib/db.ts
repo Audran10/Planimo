@@ -2,6 +2,12 @@ import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../../generated/client'
 
+/**
+ * Sécurité : Prisma utilise des requêtes paramétrées qui protègent
+ * nativement contre les injections SQL (OWASP A03:2021).
+ * Ne jamais construire de requêtes SQL brutes avec des données utilisateur.
+ */
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
