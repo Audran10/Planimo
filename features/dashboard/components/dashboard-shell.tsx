@@ -16,7 +16,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Header onMenuClick={() => setMobileOpen(true)} />
-          <main className="flex-1 p-6">{children}</main>
+          <main id="main-content" className="flex-1 p-6">{children}</main>
         </div>
       </div>
     </PageHeaderProvider>

@@ -25,7 +25,7 @@ export function AddWorkOrderButton({
         className="cursor-pointer gap-2"
         onClick={() => setOpen(true)}
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-4 w-4" aria-hidden="true" />
         {label}
       </Button>
       <WorkOrderFormDialog

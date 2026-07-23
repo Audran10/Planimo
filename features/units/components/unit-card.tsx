@@ -97,21 +97,21 @@ export function UnitCard({
         >
           <DropdownMenu>
             <DropdownMenuTrigger
+              aria-label="Options"
               render={
                 <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" />
               }
             >
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Menu</span>
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => router.push(href)}>
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4" aria-hidden="true" />
                 Voir
               </DropdownMenuItem>
               {canEdit && (
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" aria-hidden="true" />
                   Modifier
                 </DropdownMenuItem>
               )}
@@ -120,7 +120,7 @@ export function UnitCard({
                   variant="destructive"
                   onClick={() => setDeleteOpen(true)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                   Supprimer
                 </DropdownMenuItem>
               )}
@@ -130,7 +130,7 @@ export function UnitCard({
 
         <CardHeader>
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <DoorOpen className="h-5 w-5 text-primary" />
+            <DoorOpen className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
         </CardHeader>
 
@@ -139,7 +139,7 @@ export function UnitCard({
             <h3 className="font-semibold">{unit.name}</h3>
             {details && (
               <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Layers className="h-3.5 w-3.5 shrink-0" />
+                <Layers className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {details}
               </p>
             )}
@@ -157,7 +157,7 @@ export function UnitCard({
               {unit.isOccupied ? 'Occupé' : 'Vacant'}
             </Badge>
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <FileText className="h-3.5 w-3.5" />
+              <FileText className="h-3.5 w-3.5" aria-hidden="true" />
               {unit.documentsCount}{' '}
               {unit.documentsCount > 1 ? 'documents' : 'document'}
             </span>

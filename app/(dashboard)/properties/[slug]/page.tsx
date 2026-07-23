@@ -69,7 +69,7 @@ export default async function PropertyDetailPage({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-            <Icon className="h-6 w-6 text-primary" />
+            <Icon className="h-6 w-6 text-primary" aria-hidden="true" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -79,7 +79,7 @@ export default async function PropertyDetailPage({
               </Badge>
             </div>
             <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5" />
+              <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
               {property.address}
             </p>
             <Badge variant="secondary" className="mt-2">
@@ -111,7 +111,7 @@ export default async function PropertyDetailPage({
           {units.length === 0 ? (
             <Card className="border border-dashed border-border">
               <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-                <DoorOpen className="h-8 w-8 text-muted-foreground" />
+                <DoorOpen className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">
                   Aucun {getUnitLabel(property.type).toLowerCase()} pour le moment
                 </p>

@@ -17,7 +17,11 @@ export function DocumentTypeIcon({
   fileType: string
   className?: string
 }) {
-  if (fileType === 'application/pdf') return <FileText className={className} />
-  if (fileType.startsWith('image/')) return <ImageIcon className={className} />
-  return <File className={className} />
+  if (fileType === 'application/pdf') {
+    return <FileText className={className} aria-hidden="true" />
+  }
+  if (fileType.startsWith('image/')) {
+    return <ImageIcon className={className} aria-hidden="true" />
+  }
+  return <File className={className} aria-hidden="true" />
 }

@@ -50,7 +50,7 @@ export default function AuthLayout({
         </div>
 
         {/* Panneau droit — formulaire */}
-        <div className="flex-1 flex items-center justify-center p-8">
+        <div id="main-content" className="flex-1 flex items-center justify-center p-8">
           {children}
         </div>
       </div>

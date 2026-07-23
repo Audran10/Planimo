@@ -62,6 +62,7 @@ export function RegisterForm() {
                   type="text"
                   placeholder="Marc Bernard"
                   disabled={loading}
+                  aria-required="true"
                   className="h-11"
                   {...field}
                 />
@@ -82,6 +83,7 @@ export function RegisterForm() {
                   type="email"
                   placeholder="marc@example.com"
                   disabled={loading}
+                  aria-required="true"
                   className="h-11"
                   {...field}
                 />
@@ -102,6 +104,7 @@ export function RegisterForm() {
                   type="password"
                   placeholder="••••••••"
                   disabled={loading}
+                  aria-required="true"
                   className="h-11"
                   {...field}
                 />
@@ -115,7 +118,10 @@ export function RegisterForm() {
         />
 
         {error && (
-          <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
+          <div
+            role="alert"
+            className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3"
+          >
             <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
@@ -127,7 +133,7 @@ export function RegisterForm() {
         >
           {loading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Création du compte...
             </>
           ) : (

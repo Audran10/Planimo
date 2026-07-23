@@ -47,7 +47,7 @@ function StatCard(stat: StatItem) {
           {stat.label}
         </p>
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-          <stat.icon className="h-4 w-4 text-primary" />
+          <stat.icon className="h-4 w-4 text-primary" aria-hidden="true" />
         </div>
       </CardHeader>
       <CardContent>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-              <Inbox className="h-8 w-8 text-muted-foreground" />
+              <Inbox className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
               <p className="text-sm text-muted-foreground">
                 Aucune activité pour le moment
               </p>
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                 render={<Link href={action.href} />}
                 className="w-full cursor-pointer justify-start gap-2 border border-border transition-all duration-200"
               >
-                <action.icon className="h-4 w-4" />
+                <action.icon className="h-4 w-4" aria-hidden="true" />
                 {action.label}
               </Button>
             ))}

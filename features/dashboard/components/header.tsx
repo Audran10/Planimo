@@ -41,18 +41,18 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       <Button
         variant="ghost"
         size="icon"
+        aria-label="Ouvrir le menu de navigation"
         className="cursor-pointer lg:hidden"
         onClick={onMenuClick}
       >
-        <Menu className="h-5 w-5" />
-        <span className="sr-only">Ouvrir le menu</span>
+        <Menu className="h-5 w-5" aria-hidden="true" />
       </Button>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           {crumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="flex items-center gap-1">
-              {index > 0 && <ChevronRight className="h-3 w-3" />}
+              {index > 0 && <ChevronRight className="h-3 w-3" aria-hidden="true" />}
               {crumb.href ? (
                 <Link href={crumb.href} className="hover:text-foreground hover:underline">
                   {crumb.label}
@@ -67,9 +67,13 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-1">
-        <Button variant="ghost" size="icon" className="cursor-pointer">
-          <Bell className="h-4 w-4" />
-          <span className="sr-only">Notifications</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Notifications"
+          className="cursor-pointer"
+        >
+          <Bell className="h-4 w-4" aria-hidden="true" />
         </Button>
         <ThemeToggle />
       </div>

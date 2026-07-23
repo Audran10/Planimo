@@ -65,21 +65,21 @@ function DocumentRow({ document }: { document: Document }) {
         <Button
           variant="ghost"
           size="icon-sm"
+          aria-label="Télécharger"
           className="cursor-pointer"
           nativeButton={false}
           render={<a href={document.fileUrl} target="_blank" rel="noopener noreferrer" />}
         >
-          <Download className="h-4 w-4" />
-          <span className="sr-only">Télécharger</span>
+          <Download className="h-4 w-4" aria-hidden="true" />
         </Button>
         <Button
           variant="ghost"
           size="icon-sm"
+          aria-label="Supprimer"
           className="cursor-pointer text-muted-foreground hover:text-destructive"
           onClick={() => setDeleteOpen(true)}
         >
-          <Trash2 className="h-4 w-4" />
-          <span className="sr-only">Supprimer</span>
+          <Trash2 className="h-4 w-4" aria-hidden="true" />
         </Button>
       </li>
 
@@ -112,7 +112,7 @@ export function DocumentList({ documents }: { documents: Document[] }) {
   if (documents.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-        <FileX className="h-8 w-8 text-muted-foreground" />
+        <FileX className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">Aucun document pour le moment</p>
       </div>
     )

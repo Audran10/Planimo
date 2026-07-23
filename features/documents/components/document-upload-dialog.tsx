@@ -146,7 +146,7 @@ export function DocumentUploadDialog({
                     disabled={loading}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger aria-required="true" className="w-full">
                         <SelectValue placeholder="Sélectionnez un type" />
                       </SelectTrigger>
                     </FormControl>
@@ -173,6 +173,7 @@ export function DocumentUploadDialog({
                     <Input
                       placeholder="Facture électricité janvier"
                       disabled={loading}
+                      aria-required="true"
                       {...field}
                     />
                   </FormControl>
@@ -201,7 +202,7 @@ export function DocumentUploadDialog({
                 className="cursor-pointer"
                 disabled={loading || !file}
               >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 Ajouter
               </Button>
             </DialogFooter>
