@@ -18,7 +18,6 @@ import type {
   FloorPlanZone,
   MemberRole,
   PropertyType,
-  WorkOrderStatus,
 } from '@/core/types'
 import type { PropertyRole } from '@/features/properties/types'
 
@@ -51,7 +50,6 @@ async function loadUnitDetail(
       rooms: { orderBy: { createdAt: 'asc' } },
       tenants: { orderBy: { leaseStart: 'desc' } },
       documents: { orderBy: { createdAt: 'desc' } },
-      workOrders: { orderBy: { createdAt: 'desc' } },
     },
   })
 
@@ -70,10 +68,6 @@ async function loadUnitDetail(
     documents: unit.documents.map((doc) => ({
       ...doc,
       type: doc.type as DocumentType,
-    })),
-    workOrders: unit.workOrders.map((workOrder) => ({
-      ...workOrder,
-      status: workOrder.status as WorkOrderStatus,
     })),
     role: access.role as PropertyRole,
   }
