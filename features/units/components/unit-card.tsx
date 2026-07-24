@@ -89,7 +89,7 @@ export function UnitCard({
     <>
       <Card
         onClick={() => router.push(href)}
-        className="relative cursor-pointer rounded-xl border border-border transition-all duration-200 hover:shadow-md"
+        className="relative cursor-pointer rounded-xl border border-border transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
       >
         <div
           className="absolute top-3 right-3"

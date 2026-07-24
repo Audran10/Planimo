@@ -12,6 +12,7 @@ interface AddDocumentButtonProps {
   roomId?: string
   tenantId?: string
   label?: string
+  onSuccess?: () => void
 }
 
 export function AddDocumentButton({
@@ -21,6 +22,7 @@ export function AddDocumentButton({
   roomId,
   tenantId,
   label = 'Ajouter un document',
+  onSuccess,
 }: AddDocumentButtonProps) {
   const [open, setOpen] = useState(false)
 
@@ -42,6 +44,7 @@ export function AddDocumentButton({
         tenantId={tenantId}
         open={open}
         onOpenChange={setOpen}
+        onSuccess={onSuccess}
       />
     </>
   )

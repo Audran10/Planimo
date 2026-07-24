@@ -83,7 +83,12 @@ function extractStoragePath(fileUrl: string, bucket: string): string | null {
 // coordinates can move and its Room can be renamed independently, but the
 // slug never changes, so matching never depends on re-deriving it from name.
 async function syncRoomsWithZones(unitId: string, zones: FloorPlanZone[]) {
-  const zoneIds = new Set(zones.map((zone) => zone.id))
+  // Zones can arrive with duplicate ids (AI segmentation glitch, stale
+  // client state) — keep the last occurrence so slug (unique per unit)
+  // never collides during the create/update pass below.
+  const uniqueZones = Array.from(new Map(zones.map((zone) => [zone.id, zone])).values())
+
+  const zoneIds = new Set(uniqueZones.map((zone) => zone.id))
   const existingRooms = await prisma.room.findMany({ where: { unitId } })
 
   const staleRoomIds = existingRooms
@@ -93,7 +98,7 @@ async function syncRoomsWithZones(unitId: string, zones: FloorPlanZone[]) {
     await prisma.room.deleteMany({ where: { id: { in: staleRoomIds } } })
   }
 
-  for (const zone of zones) {
+  for (const zone of uniqueZones) {
     const existing = existingRooms.find((room) => room.slug === zone.id)
 
     if (existing) {

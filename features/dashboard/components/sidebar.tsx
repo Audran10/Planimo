@@ -12,6 +12,7 @@ import {
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar'
 import { Button } from '@/core/components/ui/button'
 import { Separator } from '@/core/components/ui/separator'
+import { Logo } from '@/core/components/shared/logo'
 import { ThemeToggle } from '@/core/components/shared/theme-toggle'
 import {
   Sheet,
@@ -58,10 +59,10 @@ function SidebarNav() {
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
             className={cn(
-              'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+              'flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200',
               isActive
-                ? 'bg-primary text-white'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
             )}
           >
             <item.icon className="h-4 w-4" aria-hidden="true" />
@@ -85,14 +86,14 @@ function SidebarFooter() {
 
   return (
     <div className="mt-auto shrink-0 space-y-2 p-2.5">
-      <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-2.5">
-        <Avatar size="sm">
-          <AvatarFallback className="bg-primary/10 font-medium text-primary">
+      <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-2">
+        <Avatar size="sm" className="h-7 w-7">
+          <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
             {getInitials(session?.user?.name)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">
+          <p className="truncate text-xs font-medium">
             {session?.user?.name ?? '—'}
           </p>
           <p className="truncate text-xs text-muted-foreground">
@@ -119,18 +120,15 @@ function SidebarFooter() {
 
 function SidebarBrand() {
   return (
-    <div className="flex shrink-0 items-center gap-2 px-4 py-4">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-lg">
-        <span className="text-sm font-bold text-white">P</span>
-      </div>
-      <span className="font-semibold text-lg">planimo</span>
+    <div className="shrink-0 px-4 py-5">
+      <Logo />
     </div>
   )
 }
 
 export function Sidebar() {
   return (
-    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-sidebar">
+    <aside className="hidden h-screen shadow-[1px_0_0_0_hsl(var(--border))] lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:overflow-hidden lg:bg-gray-50 dark:lg:bg-gray-950">
       <SidebarBrand />
       <SidebarNav />
       <Separator className="my-2 shrink-0" />
@@ -148,7 +146,10 @@ export function MobileSidebar({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="flex w-60 flex-col bg-sidebar p-0">
+      <SheetContent
+        side="left"
+        className="flex w-60 flex-col bg-gray-50 p-0 dark:bg-gray-950"
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>

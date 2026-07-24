@@ -52,7 +52,6 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
   const containerRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const dragState = useRef<DragState | null>(null)
-  const zoneIdCounter = useRef(0)
 
   const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0, top: 0, left: 0 })
   const [zones, setZones] = useState<FloorPlanZone[]>(initialZones)
@@ -150,9 +149,8 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
   function handleBackgroundPointerDown(event: ReactPointerEvent) {
     if (!editMode || !addingRoom) return
     const { x, y } = percentFromEvent(event)
-    zoneIdCounter.current += 1
     const newZone: FloorPlanZone = {
-      id: `piece-${zoneIdCounter.current}`,
+      id: crypto.randomUUID(),
       name: 'Nouvelle pièce',
       coordinates: { x, y, width: 0, height: 0 },
     }
@@ -414,7 +412,7 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
             const strokeWidth = isSelected ? 2.5 : isHovered ? 2 : 1.5
 
             return (
-              <g key={zone.id}>
+              <g key={zone.id || `zone-${index}`}>
                 <rect
                   x={x}
                   y={y}

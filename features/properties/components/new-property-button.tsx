@@ -14,7 +14,7 @@ export function NewPropertyButton({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="cursor-pointer gap-2">
+      <Button onClick={() => setOpen(true)} className="cursor-pointer gap-2 shadow-sm">
         <Plus className="h-4 w-4" aria-hidden="true" />
         {label}
       </Button>

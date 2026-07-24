@@ -53,6 +53,7 @@ interface DocumentUploadDialogProps {
   tenantId?: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
 export function DocumentUploadDialog({
@@ -63,6 +64,7 @@ export function DocumentUploadDialog({
   tenantId,
   open,
   onOpenChange,
+  onSuccess,
 }: DocumentUploadDialogProps) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -109,6 +111,7 @@ export function DocumentUploadDialog({
       form.reset({ name: '', type: 'other', unitId, roomId, tenantId })
       setFile(null)
       onOpenChange(false)
+      onSuccess?.()
       router.refresh()
     } catch (error) {
       toast.error(

@@ -80,6 +80,7 @@ interface WorkOrderFormDialogProps {
   workOrder?: WorkOrder
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
 export function WorkOrderFormDialog({
@@ -89,6 +90,7 @@ export function WorkOrderFormDialog({
   workOrder,
   open,
   onOpenChange,
+  onSuccess,
 }: WorkOrderFormDialogProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -126,6 +128,7 @@ export function WorkOrderFormDialog({
         toast.success('Intervention ajoutée avec succès')
       }
       handleOpenChange(false)
+      onSuccess?.()
       router.refresh()
     } catch (error) {
       const message =

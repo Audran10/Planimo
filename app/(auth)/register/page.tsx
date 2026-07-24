@@ -1,15 +1,13 @@
 import { RegisterForm } from '@/features/auth/components/register-form'
+import { Logo } from '@/core/components/shared/logo'
 import Link from 'next/link'
 
 export default function RegisterPage() {
   return (
     <div className="w-full max-w-md space-y-8">
       {/* Logo mobile uniquement */}
-      <div className="flex lg:hidden items-center gap-2 mb-8">
-        <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-sm">P</span>
-        </div>
-        <span className="font-semibold text-lg">planimo</span>
+      <div className="lg:hidden mb-8">
+        <Logo />
       </div>
 
       <div className="space-y-2">

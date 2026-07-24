@@ -33,26 +33,28 @@ interface StatItem {
   hint: string
   href?: string
   borderColor: string
+  iconBg: string
+  iconColor: string
 }
 
 function StatCard(stat: StatItem) {
   const content = (
     <Card
       className={
-        `border border-border border-l-4 ${stat.borderColor} transition-all duration-200 hover:shadow-md` +
+        `border border-border border-l-4 ${stat.borderColor} shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:shadow-md` +
         (stat.href ? ' cursor-pointer' : '')
       }
     >
       <CardHeader className="flex-row items-start justify-between">
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
           {stat.label}
         </p>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-          <stat.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+        <div className={`flex h-9 w-9 items-center justify-center rounded-lg p-2 ${stat.iconBg}`}>
+          <stat.icon className={`h-4 w-4 ${stat.iconColor}`} aria-hidden="true" />
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+        <p className="text-4xl font-bold">{stat.value}</p>
         {stat.href ? (
           <p className="mt-2 text-xs text-primary hover:underline">
             + {stat.hint}
@@ -90,6 +92,8 @@ export default async function DashboardPage() {
       hint: 'Ajouter un bien',
       href: '/properties',
       borderColor: 'border-l-indigo-500',
+      iconBg: 'bg-indigo-50 dark:bg-indigo-950',
+      iconColor: 'text-indigo-600',
     },
     {
       label: 'Appartements',
@@ -97,6 +101,8 @@ export default async function DashboardPage() {
       icon: Home,
       hint: 'Aucun appartement pour le moment',
       borderColor: 'border-l-emerald-500',
+      iconBg: 'bg-emerald-50 dark:bg-emerald-950',
+      iconColor: 'text-emerald-600',
     },
     {
       label: 'Locataires',
@@ -105,6 +111,8 @@ export default async function DashboardPage() {
       hint: 'Ajouter un locataire',
       href: '/tenants',
       borderColor: 'border-l-amber-500',
+      iconBg: 'bg-amber-50 dark:bg-amber-950',
+      iconColor: 'text-amber-600',
     },
     {
       label: 'Documents',
@@ -113,6 +121,8 @@ export default async function DashboardPage() {
       hint: 'Importer un document',
       href: '/documents',
       borderColor: 'border-l-violet-500',
+      iconBg: 'bg-violet-50 dark:bg-violet-950',
+      iconColor: 'text-violet-600',
     },
   ]
 
