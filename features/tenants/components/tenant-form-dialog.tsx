@@ -200,7 +200,10 @@ export function TenantFormDialog({
             className="space-y-4"
           >
             {serverError && (
-              <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
+              <div
+                role="alert"
+                className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3"
+              >
                 <p className="text-sm text-destructive">{serverError}</p>
               </div>
             )}
@@ -212,7 +215,12 @@ export function TenantFormDialog({
                 <FormItem>
                   <FormLabel>Nom complet</FormLabel>
                   <FormControl>
-                    <Input placeholder="Marc Bernard" disabled={loading} {...field} />
+                    <Input
+                      placeholder="Marc Bernard"
+                      disabled={loading}
+                      aria-required="true"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -274,6 +282,7 @@ export function TenantFormDialog({
                       <Input
                         type="date"
                         disabled={loading}
+                        aria-required="true"
                         value={toDateInputValue(field.value as Date)}
                         onChange={(e) =>
                           field.onChange(
@@ -323,6 +332,7 @@ export function TenantFormDialog({
                         type="number"
                         placeholder="850"
                         disabled={loading}
+                        aria-required="true"
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) =>
@@ -388,7 +398,7 @@ export function TenantFormDialog({
                 Annuler
               </Button>
               <Button type="submit" className="cursor-pointer" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 Enregistrer
               </Button>
             </DialogFooter>

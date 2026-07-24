@@ -75,8 +75,22 @@ Pour que le job `deploy` du workflow (`.github/workflows/ci.yml`) puisse déploy
 | `VERCEL_TOKEN` | [vercel.com](https://vercel.com) → Settings → Tokens |
 | `VERCEL_ORG_ID` | vercel.com → Settings → General |
 | `VERCEL_PROJECT_ID` | Récupéré après création du projet sur Vercel (Project Settings → General) |
+| `NEXT_PUBLIC_SENTRY_DSN` | Le DSN du projet Sentry (sentry.io → Project Settings → Client Keys (DSN)) |
 
 Le job `build` a également besoin des secrets d'environnement applicatifs (`DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`) — voir `.github/workflows/ci.yml`.
+
+### Monitoring des erreurs (Sentry)
+
+Sentry est intégré via `@sentry/nextjs` et n'est actif qu'en production (`enabled: process.env.NODE_ENV === 'production'`) — aucune erreur n'est remontée en développement ou en preview local.
+
+Variables nécessaires :
+
+| Variable | Où la définir |
+| --- | --- |
+| `NEXT_PUBLIC_SENTRY_DSN` | GitHub Secrets (build CI) **et** Vercel → Project Settings → Environment Variables (runtime) |
+| `SENTRY_AUTH_TOKEN` | Optionnel — uniquement nécessaire pour l'upload des source maps lors du build (sentry.io → Settings → Auth Tokens) |
+
+Le DSN n'est jamais codé en dur dans le code, uniquement lu via `process.env.NEXT_PUBLIC_SENTRY_DSN`.
 
 ### Workflow complet
 

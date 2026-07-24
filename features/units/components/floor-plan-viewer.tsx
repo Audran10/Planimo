@@ -311,7 +311,7 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
               className="cursor-pointer gap-2"
               onClick={() => setAddingRoom((current) => !current)}
             >
-              <Square className="h-4 w-4" />
+              <Square className="h-4 w-4" aria-hidden="true" />
               Ajouter une pièce
             </Button>
             <Button
@@ -319,11 +319,11 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
               className="cursor-pointer gap-2"
               onClick={handleCancelEdit}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
               Annuler
             </Button>
             <Button className="cursor-pointer gap-2" onClick={handleSave} disabled={saving}>
-              <Save className="h-4 w-4" />
+              <Save className="h-4 w-4" aria-hidden="true" />
               {saving ? 'Sauvegarde...' : 'Sauvegarder'}
             </Button>
           </>
@@ -333,7 +333,7 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
             className="cursor-pointer gap-2"
             onClick={() => setEditMode(true)}
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-4 w-4" aria-hidden="true" />
             Modifier les zones
           </Button>
         )}
@@ -390,10 +390,19 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
                   stroke={ZONE_COLOR}
                   strokeWidth={strokeWidth}
                   className="cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Ouvrir la pièce ${room?.name || zone.name}`}
                   onMouseEnter={() => setHoveredZoneId(zone.id)}
                   onMouseLeave={() => setHoveredZoneId(null)}
                   onPointerDown={(event) => handleZonePointerDown(event, zone)}
                   onClick={() => handleZoneClick(zone)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      handleZoneClick(zone)
+                    }
+                  }}
                 />
                 <foreignObject
                   x={x}

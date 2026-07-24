@@ -16,7 +16,7 @@ export function InviteMemberButton({ propertyId }: { propertyId: string }) {
         className="cursor-pointer gap-2"
         onClick={() => setOpen(true)}
       >
-        <UserPlus className="h-4 w-4" />
+        <UserPlus className="h-4 w-4" aria-hidden="true" />
         Inviter
       </Button>
       <InviteDialog propertyId={propertyId} open={open} onOpenChange={setOpen} />

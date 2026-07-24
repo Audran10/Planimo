@@ -8,7 +8,7 @@ export function WorkOrderList({ workOrders }: { workOrders: WorkOrder[] }) {
   if (workOrders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <Wrench className="h-8 w-8 text-muted-foreground" />
+        <Wrench className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">
           Aucune intervention pour le moment
         </p>

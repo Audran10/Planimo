@@ -132,6 +132,7 @@ export function PropertyFormDialog({
                     <Input
                       placeholder="Résidence des Lilas"
                       disabled={loading}
+                      aria-required="true"
                       {...field}
                     />
                   </FormControl>
@@ -150,6 +151,7 @@ export function PropertyFormDialog({
                     <Input
                       placeholder="12 rue des Lilas, 75011 Paris"
                       disabled={loading}
+                      aria-required="true"
                       {...field}
                     />
                   </FormControl>
@@ -171,7 +173,7 @@ export function PropertyFormDialog({
                     disabled={loading}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger aria-required="true" className="w-full">
                         <SelectValue placeholder="Sélectionnez un type" />
                       </SelectTrigger>
                     </FormControl>
@@ -217,7 +219,7 @@ export function PropertyFormDialog({
                 Annuler
               </Button>
               <Button type="submit" className="cursor-pointer" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 {mode === 'edit' ? 'Modifier' : 'Créer'}
               </Button>
             </DialogFooter>

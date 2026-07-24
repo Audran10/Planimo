@@ -31,7 +31,7 @@ export function AddDocumentButton({
         className="cursor-pointer gap-2"
         onClick={() => setOpen(true)}
       >
-        <FileUp className="h-4 w-4" />
+        <FileUp className="h-4 w-4" aria-hidden="true" />
         {label}
       </Button>
       <DocumentUploadDialog

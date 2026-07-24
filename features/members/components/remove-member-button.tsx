@@ -49,11 +49,11 @@ export function RemoveMemberButton({
       <Button
         variant="ghost"
         size="icon-sm"
+        aria-label="Retirer ce membre"
         className="cursor-pointer text-muted-foreground hover:text-destructive"
         onClick={() => setOpen(true)}
       >
-        <Trash2 className="h-4 w-4" />
-        <span className="sr-only">Retirer ce membre</span>
+        <Trash2 className="h-4 w-4" aria-hidden="true" />
       </Button>
 
       <AlertDialog open={open} onOpenChange={setOpen}>

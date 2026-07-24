@@ -7,6 +7,11 @@ import { revalidatePath } from 'next/cache'
 import { uploadFile, deleteFile } from '@/core/lib/supabase'
 import { checkPropertyAccess } from '@/features/members/actions/members'
 import { documentSchema } from '../schemas/document.schema'
+import {
+  MAX_FILE_SIZE,
+  hasDangerousExtension,
+  isAllowedContentType,
+} from '../lib/file-validation'
 import type { CreateDocumentInput, DocumentListItem } from '../types'
 import type { DocumentType, MemberRole } from '@/core/types'
 
@@ -270,8 +275,23 @@ export async function uploadDocumentFile(
     throw new Error('Fichier invalide')
   }
 
+  // Le path doit toujours commencer par l'ID de l'utilisateur authentifié :
+  // c'est ce qui empêche un utilisateur d'écrire (ou d'écraser) des fichiers
+  // dans le dossier Storage d'un autre utilisateur.
   if (!path.startsWith(`${session.user.id}/`)) {
     throw new Error('Chemin de fichier invalide')
+  }
+
+  if (hasDangerousExtension(file.name)) {
+    throw new Error('Type de fichier non autorisé')
+  }
+
+  if (!isAllowedContentType(file.type)) {
+    throw new Error('Type de fichier non autorisé (PDF ou image uniquement)')
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('Le fichier dépasse la taille maximale de 10 Mo')
   }
 
   const url = await uploadFile(file, bucket, path)

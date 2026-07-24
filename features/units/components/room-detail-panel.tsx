@@ -154,22 +154,22 @@ export function RoomDetailPanel({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label="Confirmer"
                 className="cursor-pointer text-primary"
                 onClick={() => void confirmRename()}
                 disabled={renaming}
               >
-                <Check className="h-4 w-4" />
-                <span className="sr-only">Confirmer</span>
+                <Check className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label="Annuler"
                 className="cursor-pointer"
                 onClick={cancelRename}
                 disabled={renaming}
               >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Annuler</span>
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           ) : (
@@ -178,11 +178,11 @@ export function RoomDetailPanel({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                aria-label="Renommer"
                 className="cursor-pointer"
                 onClick={startEditingName}
               >
-                <Pencil className="h-3.5 w-3.5" />
-                <span className="sr-only">Renommer</span>
+                <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
               </Button>
             </div>
           )}

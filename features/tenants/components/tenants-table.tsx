@@ -24,16 +24,16 @@ export function TenantsTable({ tenants }: { tenants: TenantListItem[] }) {
   const router = useRouter()
 
   return (
-    <Table>
+    <Table aria-label="Liste des locataires actifs">
       <TableHeader>
         <TableRow>
-          <TableHead>Nom</TableHead>
-          <TableHead>Bien</TableHead>
-          <TableHead>Appartement</TableHead>
-          <TableHead>Loyer</TableHead>
-          <TableHead>Début bail</TableHead>
-          <TableHead>Fin bail</TableHead>
-          <TableHead>Statut</TableHead>
+          <TableHead scope="col">Nom</TableHead>
+          <TableHead scope="col">Bien</TableHead>
+          <TableHead scope="col">Appartement</TableHead>
+          <TableHead scope="col">Loyer</TableHead>
+          <TableHead scope="col">Début bail</TableHead>
+          <TableHead scope="col">Fin bail</TableHead>
+          <TableHead scope="col">Statut</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

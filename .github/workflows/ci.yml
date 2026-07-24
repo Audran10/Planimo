@@ -38,6 +38,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Security audit
+        run: pnpm audit --audit-level=high
+
   test:
     name: Tests unitaires
     runs-on: ubuntu-latest

@@ -151,12 +151,12 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
         >
           {stage === 'uploading' ? (
             <>
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden="true" />
               <p className="text-sm text-muted-foreground">Upload en cours...</p>
             </>
           ) : (
             <>
-              <Upload className="h-8 w-8 text-muted-foreground" />
+              <Upload className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
               <p className="text-sm text-muted-foreground">
                 Glissez le plan (PDF ou image) ou cliquez pour parcourir
               </p>
@@ -190,7 +190,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
 
       {stage === 'analyzing' && (
         <div className="space-y-1">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" aria-hidden="true" />
           <p className="text-sm font-medium">Claude analyse votre plan...</p>
           <p className="text-xs text-muted-foreground">Estimation : 5 à 15 secondes</p>
         </div>
@@ -205,7 +205,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
           {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex items-center justify-center gap-2">
             <Button className="cursor-pointer gap-2" onClick={handleAnalyze}>
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
               Analyser avec l&apos;IA
             </Button>
             <Button
@@ -213,7 +213,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
               className="cursor-pointer gap-2 text-destructive hover:text-destructive"
               onClick={handleDelete}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
               Supprimer le plan
             </Button>
           </div>
@@ -234,7 +234,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
               className="cursor-pointer gap-2 text-destructive hover:text-destructive"
               onClick={handleDelete}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
               Supprimer le plan
             </Button>
           </div>
@@ -259,7 +259,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
               className="cursor-pointer gap-2 text-destructive hover:text-destructive"
               onClick={handleDelete}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
               Supprimer le plan
             </Button>
           </div>

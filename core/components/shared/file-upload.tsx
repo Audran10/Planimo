@@ -112,7 +112,7 @@ export function FileUpload({
             disabled && 'pointer-events-none opacity-50'
           )}
         >
-          <Upload className="h-6 w-6 text-muted-foreground" />
+          <Upload className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
           <p className="text-sm text-muted-foreground">{label}</p>
           <p className="text-xs text-muted-foreground">PDF ou image · {maxSizeLabel}</p>
           <input
@@ -134,7 +134,7 @@ export function FileUpload({
               className="h-10 w-10 shrink-0 rounded object-cover"
             />
           ) : (
-            <FileText className="h-8 w-8 shrink-0 text-muted-foreground" />
+            <FileText className="h-8 w-8 shrink-0 text-muted-foreground" aria-hidden="true" />
           )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{file.name}</p>
@@ -152,12 +152,12 @@ export function FileUpload({
             type="button"
             variant="ghost"
             size="icon-sm"
+            aria-label="Retirer le fichier"
             className="cursor-pointer shrink-0"
             onClick={handleRemove}
             disabled={disabled || uploading}
           >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Retirer le fichier</span>
+            <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       )}

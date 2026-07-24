@@ -61,6 +61,7 @@ export function LoginForm() {
                   type="email"
                   placeholder="marc@example.com"
                   disabled={loading}
+                  aria-required="true"
                   className="h-11"
                   {...field}
                 />
@@ -81,6 +82,7 @@ export function LoginForm() {
                   type="password"
                   placeholder="••••••••"
                   disabled={loading}
+                  aria-required="true"
                   className="h-11"
                   {...field}
                 />
@@ -91,7 +93,10 @@ export function LoginForm() {
         />
 
         {error && (
-          <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
+          <div
+            role="alert"
+            className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3"
+          >
             <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
@@ -103,7 +108,7 @@ export function LoginForm() {
         >
           {loading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Connexion...
             </>
           ) : (

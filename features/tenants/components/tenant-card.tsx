@@ -93,20 +93,20 @@ export function TenantCard({
           <Button
             variant="ghost"
             size="icon-sm"
+            aria-label="Modifier"
             className="cursor-pointer"
             onClick={() => setEditOpen(true)}
           >
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Modifier</span>
+            <Pencil className="h-4 w-4" aria-hidden="true" />
           </Button>
           <Button
             variant="ghost"
             size="icon-sm"
+            aria-label="Supprimer"
             className="cursor-pointer text-muted-foreground hover:text-destructive"
             onClick={() => setDeleteOpen(true)}
           >
-            <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Supprimer</span>
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
 
@@ -128,19 +128,19 @@ export function TenantCard({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 Voir le contrat
               </a>
             )}
             {tenant.email && (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Mail className="h-3.5 w-3.5 shrink-0" />
+                <Mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {tenant.email}
               </p>
             )}
             {tenant.phone && (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Phone className="h-3.5 w-3.5 shrink-0" />
+                <Phone className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {tenant.phone}
               </p>
             )}
