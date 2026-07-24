@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Save, Square, X } from 'lucide-react'
+import { Loader2, Pencil, Save, Sparkles, Square, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/core/components/ui/button'
-import { updateFloorPlanZones } from '@/features/units/actions/floor-plan'
+import {
+  deleteFloorPlan,
+  segmentFloorPlan,
+  updateFloorPlanZones,
+} from '@/features/units/actions/floor-plan'
 import { RoomDetailPanel } from '@/features/units/components/room-detail-panel'
 import type { FloorPlanZone } from '@/core/types'
 import type { RoomWithMeta, UnitDetail } from '@/features/units/types'
@@ -19,8 +23,16 @@ interface FloorPlanViewerProps {
 const HANDLES = ['nw', 'ne', 'sw', 'se'] as const
 type HandlePosition = (typeof HANDLES)[number]
 
-const ZONE_COLOR = 'hsl(239 84% 67%)'
-const CONTAINER_HEIGHT = 550
+const ZONE_COLORS = [
+  { fill: 'rgba(99, 102, 241, 0.15)', stroke: '#6366f1' },
+  { fill: 'rgba(16, 185, 129, 0.15)', stroke: '#10b981' },
+  { fill: 'rgba(245, 158, 11, 0.15)', stroke: '#f59e0b' },
+  { fill: 'rgba(239, 68, 68, 0.15)', stroke: '#ef4444' },
+  { fill: 'rgba(168, 85, 247, 0.15)', stroke: '#a855f7' },
+  { fill: 'rgba(20, 184, 166, 0.15)', stroke: '#14b8a6' },
+  { fill: 'rgba(249, 115, 22, 0.15)', stroke: '#f97316' },
+  { fill: 'rgba(236, 72, 153, 0.15)', stroke: '#ec4899' },
+]
 
 interface DragState {
   type: 'move' | 'resize' | 'create'
@@ -31,45 +43,8 @@ interface DragState {
   original?: FloorPlanZone
 }
 
-interface Rect {
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
-}
-
-// Mirrors the browser's own `object-fit: contain` computation so the SVG
-// overlay can be positioned in the same rect the <img> actually renders
-// into — this is the only way to keep zones aligned when the container's
-// aspect ratio doesn't match the image's (no DOM API exposes that rect).
-function getContainRect(
-  containerWidth: number,
-  containerHeight: number,
-  naturalWidth: number,
-  naturalHeight: number
-): Rect {
-  if (!containerWidth || !containerHeight || !naturalWidth || !naturalHeight) {
-    return { x: 0, y: 0, width: containerWidth, height: containerHeight }
-  }
-
-  const containerRatio = containerWidth / containerHeight
-  const imageRatio = naturalWidth / naturalHeight
-
-  let width: number
-  let height: number
-  if (imageRatio > containerRatio) {
-    width = containerWidth
-    height = containerWidth / imageRatio
-  } else {
-    height = containerHeight
-    width = containerHeight * imageRatio
-  }
-
-  return { x: (containerWidth - width) / 2, y: (containerHeight - height) / 2, width, height }
 }
 
 export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanViewerProps) {
@@ -79,69 +54,67 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
   const dragState = useRef<DragState | null>(null)
   const zoneIdCounter = useRef(0)
 
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
-  const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 })
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0, top: 0, left: 0 })
   const [zones, setZones] = useState<FloorPlanZone[]>(initialZones)
   const [editMode, setEditMode] = useState(false)
   const [addingRoom, setAddingRoom] = useState(false)
   const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null)
   const [selectedRoom, setSelectedRoom] = useState<RoomWithMeta | null>(null)
   const [saving, setSaving] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
-  const containRect = getContainRect(
-    containerSize.width,
-    containerSize.height,
-    naturalSize.width,
-    naturalSize.height
-  )
+  function updateImgDimensions() {
+    if (!imgRef.current || !containerRef.current) return
+    const imgRect = imgRef.current.getBoundingClientRect()
+    const containerRect = containerRef.current.getBoundingClientRect()
+    setImgDimensions({
+      width: imgRect.width,
+      height: imgRect.height,
+      top: imgRect.top - containerRect.top,
+      left: imgRect.left - containerRect.left,
+    })
+  }
 
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
+    const container = containerRef.current
+    if (!container) return
 
-    function updateSize() {
-      if (!el) return
-      setContainerSize({ width: el.clientWidth, height: el.clientHeight })
-    }
-    updateSize()
+    updateImgDimensions()
 
-    const observer = new ResizeObserver(updateSize)
-    observer.observe(el)
+    const observer = new ResizeObserver(updateImgDimensions)
+    observer.observe(container)
     return () => observer.disconnect()
-  }, [])
-
-  function handleImageLoad() {
-    const img = imgRef.current
-    if (!img) return
-    setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight })
-  }
+  }, [unit.floorPlanUrl])
 
   function findRoomForZone(zoneId: string) {
     return rooms.find((room) => room.slug === zoneId) ?? null
   }
 
   function percentFromEvent(event: ReactPointerEvent) {
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect || containRect.width === 0 || containRect.height === 0) return { x: 0, y: 0 }
-    const localX = event.clientX - rect.left - containRect.x
-    const localY = event.clientY - rect.top - containRect.y
+    const containerRect = containerRef.current?.getBoundingClientRect()
+    if (!containerRect || imgDimensions.width === 0 || imgDimensions.height === 0) {
+      return { x: 0, y: 0 }
+    }
+    const localX = event.clientX - containerRect.left - imgDimensions.left
+    const localY = event.clientY - containerRect.top - imgDimensions.top
     return {
-      x: clamp((localX / containRect.width) * 100, 0, 100),
-      y: clamp((localY / containRect.height) * 100, 0, 100),
+      x: clamp((localX / imgDimensions.width) * 100, 0, 100),
+      y: clamp((localY / imgDimensions.height) * 100, 0, 100),
     }
   }
 
   function toPxX(percent: number) {
-    return containRect.x + (percent / 100) * containRect.width
+    return (percent / 100) * imgDimensions.width
   }
   function toPxY(percent: number) {
-    return containRect.y + (percent / 100) * containRect.height
+    return (percent / 100) * imgDimensions.height
   }
   function toPxWidth(percent: number) {
-    return (percent / 100) * containRect.width
+    return (percent / 100) * imgDimensions.width
   }
   function toPxHeight(percent: number) {
-    return (percent / 100) * containRect.height
+    return (percent / 100) * imgDimensions.height
   }
 
   function handleZoneClick(zone: FloorPlanZone) {
@@ -286,6 +259,36 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
     setAddingRoom(false)
   }
 
+  async function handleAnalyze() {
+    if (!unit.floorPlanUrl) return
+    setAnalyzing(true)
+    try {
+      const result = await segmentFloorPlan(unit.id, unit.floorPlanUrl)
+      const count = result.zones.length
+      toast.success(
+        `${count} pièce${count > 1 ? 's' : ''} détectée${count > 1 ? 's' : ''} (confiance : ${Math.round(result.confidence * 100)} %)`
+      )
+      router.refresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de l'analyse")
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      await deleteFloorPlan(unit.id)
+      toast.success('Plan supprimé')
+      router.refresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la suppression')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   async function handleSave() {
     setSaving(true)
     try {
@@ -328,21 +331,49 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
             </Button>
           </>
         ) : (
-          <Button
-            variant="outline"
-            className="cursor-pointer gap-2"
-            onClick={() => setEditMode(true)}
-          >
-            <Pencil className="h-4 w-4" aria-hidden="true" />
-            Modifier les zones
-          </Button>
+          <>
+            {zones.length === 0 && (
+              <Button
+                className="cursor-pointer gap-2"
+                onClick={handleAnalyze}
+                disabled={analyzing}
+              >
+                {analyzing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                )}
+                {analyzing ? 'Analyse en cours...' : "Analyser avec l'IA"}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              className="cursor-pointer gap-2"
+              onClick={() => setEditMode(true)}
+            >
+              <Pencil className="h-4 w-4" aria-hidden="true" />
+              Modifier les zones
+            </Button>
+            <Button
+              variant="outline"
+              className="cursor-pointer gap-2 text-destructive hover:text-destructive"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+              )}
+              {deleting ? 'Suppression...' : 'Supprimer le plan'}
+            </Button>
+          </>
         )}
       </div>
 
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-lg"
-        style={{ height: CONTAINER_HEIGHT }}
+        className="relative flex max-h-[500px] w-full items-center justify-center overflow-hidden rounded-lg"
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerDown={handleBackgroundPointerDown}
@@ -353,29 +384,33 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
             ref={imgRef}
             src={unit.floorPlanUrl}
             alt={`Plan de ${unit.name}`}
-            onLoad={handleImageLoad}
-            className="h-full w-full object-contain"
+            className="block max-h-[500px] w-auto max-w-full"
+            onLoad={updateImgDimensions}
             draggable={false}
           />
         )}
 
-        <svg className="absolute inset-0 h-full w-full overflow-visible">
-          {zones.map((zone) => {
+        <svg
+          className="absolute overflow-visible"
+          style={{
+            top: imgDimensions.top,
+            left: imgDimensions.left,
+            width: imgDimensions.width,
+            height: imgDimensions.height,
+          }}
+        >
+          {zones.map((zone, index) => {
             const isHovered = hoveredZoneId === zone.id
             const room = findRoomForZone(zone.id)
             const isSelected = selectedRoom?.id === room?.id
             const displayName = room?.name ?? zone.name ?? 'Pièce sans nom'
+            const color = ZONE_COLORS[index % ZONE_COLORS.length]
 
             const width = toPxWidth(zone.coordinates.width)
             const height = toPxHeight(zone.coordinates.height)
             const x = toPxX(zone.coordinates.x) - width / 2
             const y = toPxY(zone.coordinates.y) - height / 2
 
-            const fill = isSelected
-              ? 'hsl(239 84% 67% / 0.35)'
-              : isHovered
-                ? 'hsl(239 84% 67% / 0.25)'
-                : 'hsl(239 84% 67% / 0.1)'
             const strokeWidth = isSelected ? 2.5 : isHovered ? 2 : 1.5
 
             return (
@@ -386,8 +421,8 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
                   width={width}
                   height={height}
                   rx={4}
-                  fill={fill}
-                  stroke={ZONE_COLOR}
+                  fill={color.fill}
+                  stroke={color.stroke}
                   strokeWidth={strokeWidth}
                   className="cursor-pointer"
                   role="button"
@@ -403,7 +438,9 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
                       handleZoneClick(zone)
                     }
                   }}
-                />
+                >
+                  <title>{displayName}</title>
+                </rect>
                 <foreignObject
                   x={x}
                   y={y}
@@ -413,8 +450,8 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
                 >
                   <div className="flex h-full w-full items-center justify-center overflow-hidden px-1 text-center">
                     <span
-                      className="truncate text-[12px] font-semibold"
-                      style={{ color: ZONE_COLOR }}
+                      className="line-clamp-2 break-words text-[13px] leading-tight font-semibold"
+                      style={{ color: color.stroke }}
                     >
                       {displayName}
                     </span>
@@ -431,7 +468,7 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
                           cx={hx}
                           cy={hy}
                           r={5}
-                          fill={ZONE_COLOR}
+                          fill={color.stroke}
                           className="cursor-nwse-resize"
                           onPointerDown={(event) =>
                             handleHandlePointerDown(event, zone, handle)
@@ -472,6 +509,14 @@ export function FloorPlanViewer({ unit, zones: initialZones, rooms }: FloorPlanV
           Faites glisser une pièce pour la déplacer, ou tirez depuis un coin pour la
           redimensionner. Activez « Ajouter une pièce » puis cliquez-glissez sur le plan
           pour dessiner une nouvelle zone.
+        </p>
+      )}
+
+      {!editMode && zones.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          Aucune pièce détectée pour le moment. Cliquez sur « Analyser avec l&apos;IA »
+          pour les détecter automatiquement, ou sur « Modifier les zones » pour les
+          dessiner manuellement.
         </p>
       )}
 
