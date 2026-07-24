@@ -5,7 +5,7 @@ import { auth } from '@/core/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { checkPropertyAccess } from '@/features/members/actions/members'
-import { tenantSchema } from '../schemas/tenant.schema'
+import { tenantSchema, tenantUpdateSchema } from '../schemas/tenant.schema'
 import { isTenantActive } from '../lib/tenant-status'
 import type {
   CreateTenantInput,
@@ -115,7 +115,7 @@ export async function updateTenant(tenantId: string, input: UpdateTenantInput) {
     throw new Error('Droits insuffisants')
   }
 
-  const data = tenantSchema.partial().parse(input)
+  const data = tenantUpdateSchema.parse(input)
 
   const updated = await prisma.tenant.update({
     where: { id: tenantId },
