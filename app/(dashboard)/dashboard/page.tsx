@@ -32,13 +32,14 @@ interface StatItem {
   icon: LucideIcon
   hint: string
   href?: string
+  borderColor: string
 }
 
 function StatCard(stat: StatItem) {
   const content = (
     <Card
       className={
-        'border border-border transition-all duration-200 hover:shadow-md' +
+        `border border-border border-l-4 ${stat.borderColor} transition-all duration-200 hover:shadow-md` +
         (stat.href ? ' cursor-pointer' : '')
       }
     >
@@ -51,7 +52,7 @@ function StatCard(stat: StatItem) {
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-4xl font-bold tracking-tight">{stat.value}</p>
+        <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
         {stat.href ? (
           <p className="mt-2 text-xs text-primary hover:underline">
             + {stat.hint}
@@ -88,12 +89,14 @@ export default async function DashboardPage() {
       icon: Building2,
       hint: 'Ajouter un bien',
       href: '/properties',
+      borderColor: 'border-l-indigo-500',
     },
     {
       label: 'Appartements',
       value: unitsCount,
       icon: Home,
       hint: 'Aucun appartement pour le moment',
+      borderColor: 'border-l-emerald-500',
     },
     {
       label: 'Locataires',
@@ -101,6 +104,7 @@ export default async function DashboardPage() {
       icon: Users,
       hint: 'Ajouter un locataire',
       href: '/tenants',
+      borderColor: 'border-l-amber-500',
     },
     {
       label: 'Documents',
@@ -108,6 +112,7 @@ export default async function DashboardPage() {
       icon: FileText,
       hint: 'Importer un document',
       href: '/documents',
+      borderColor: 'border-l-violet-500',
     },
   ]
 

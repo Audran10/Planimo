@@ -49,7 +49,7 @@ export function UnitDetailActions({ unit }: { unit: UnitDetail }) {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
       {canEdit && (
         <Button
           variant="outline"
