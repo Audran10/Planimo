@@ -44,7 +44,10 @@ function SidebarNav() {
   const pathname = usePathname()
 
   return (
-    <nav aria-label="Navigation principale" className="flex-1 space-y-1 px-3">
+    <nav
+      aria-label="Navigation principale"
+      className="flex-1 space-y-1 overflow-y-auto px-3"
+    >
       {navItems.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -55,10 +58,10 @@ function SidebarNav() {
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
             className={cn(
-              'flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all duration-200',
+              'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
               isActive
-                ? 'rounded-r-lg border-l-2 border-primary bg-primary/10 text-primary'
-                : 'rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                ? 'bg-primary text-white'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
             )}
           >
             <item.icon className="h-4 w-4" aria-hidden="true" />
@@ -81,8 +84,8 @@ function SidebarFooter() {
   }
 
   return (
-    <div className="space-y-3 p-3">
-      <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
+    <div className="mt-auto shrink-0 space-y-2 p-2.5">
+      <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-2.5">
         <Avatar size="sm">
           <AvatarFallback className="bg-primary/10 font-medium text-primary">
             {getInitials(session?.user?.name)}
@@ -116,7 +119,7 @@ function SidebarFooter() {
 
 function SidebarBrand() {
   return (
-    <div className="flex items-center gap-2 px-4 py-5">
+    <div className="flex shrink-0 items-center gap-2 px-4 py-4">
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-lg">
         <span className="text-sm font-bold text-white">P</span>
       </div>
@@ -127,10 +130,10 @@ function SidebarBrand() {
 
 export function Sidebar() {
   return (
-    <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-sidebar">
+    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-sidebar">
       <SidebarBrand />
       <SidebarNav />
-      <Separator className="my-2" />
+      <Separator className="my-2 shrink-0" />
       <SidebarFooter />
     </aside>
   )

@@ -101,6 +101,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
       const analyzed = await segmentFloorPlan(unitId, uploadedUrl)
       setResult({ roomsCount: analyzed.zones.length, confidence: analyzed.confidence })
       setStage('analyzed')
+      window.location.reload()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Une erreur est survenue'
       if (message === 'Analyse IA non disponible') {
