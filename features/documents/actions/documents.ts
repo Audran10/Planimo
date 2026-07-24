@@ -7,21 +7,15 @@ import { revalidatePath } from 'next/cache'
 import { uploadFile, deleteFile } from '@/core/lib/supabase'
 import { checkPropertyAccess } from '@/features/members/actions/members'
 import { documentSchema } from '../schemas/document.schema'
+import {
+  MAX_FILE_SIZE,
+  hasDangerousExtension,
+  isAllowedContentType,
+} from '../lib/file-validation'
 import type { CreateDocumentInput, DocumentListItem } from '../types'
 import type { DocumentType, MemberRole } from '@/core/types'
 
 const DOCUMENTS_BUCKET = 'documents'
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 Mo
-const DANGEROUS_EXTENSIONS = ['.exe', '.sh', '.php', '.js']
-
-function isAllowedContentType(type: string) {
-  return type === 'application/pdf' || type.startsWith('image/')
-}
-
-function hasDangerousExtension(filename: string) {
-  const lower = filename.toLowerCase()
-  return DANGEROUS_EXTENSIONS.some((extension) => lower.endsWith(extension))
-}
 
 async function requireSession() {
   const session = await auth.api.getSession({ headers: await headers() })
