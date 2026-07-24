@@ -9,12 +9,14 @@ interface AddWorkOrderButtonProps {
   unitId: string
   roomId?: string
   label?: string
+  onSuccess?: () => void
 }
 
 export function AddWorkOrderButton({
   unitId,
   roomId,
   label = 'Ajouter une intervention',
+  onSuccess,
 }: AddWorkOrderButtonProps) {
   const [open, setOpen] = useState(false)
 
@@ -34,6 +36,7 @@ export function AddWorkOrderButton({
         roomId={roomId}
         open={open}
         onOpenChange={setOpen}
+        onSuccess={onSuccess}
       />
     </>
   )

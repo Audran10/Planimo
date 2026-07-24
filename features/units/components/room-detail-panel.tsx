@@ -49,10 +49,17 @@ export function RoomDetailPanel({
   const [documents, setDocuments] = useState<Document[]>([])
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshKey, setRefreshKey] = useState(0)
 
+  const [roomName, setRoomName] = useState(room.name)
   const [editingName, setEditingName] = useState(false)
   const [draftName, setDraftName] = useState(room.name)
   const [renaming, setRenaming] = useState(false)
+
+  function refresh() {
+    setRefreshKey((key) => key + 1)
+    router.refresh()
+  }
 
   const [paintRef, setPaintRef] = useState(room.zoneCoordinates?.paintRef ?? '')
   const [dimensions, setDimensions] = useState(room.zoneCoordinates?.dimensions ?? '')
@@ -79,7 +86,7 @@ export function RoomDetailPanel({
         toast.error('Erreur lors du chargement des données de la pièce')
       })
       .finally(() => setLoading(false))
-  }, [room.id, unitId])
+  }, [room.id, unitId, refreshKey])
 
   useEffect(() => {
     if (isFirstTechnicalRender.current) {
@@ -100,13 +107,13 @@ export function RoomDetailPanel({
   }, [room.id, debouncedPaintRef, debouncedDimensions, debouncedNotes])
 
   function startEditingName() {
-    setDraftName(room.name)
+    setDraftName(roomName)
     setEditingName(true)
   }
 
   async function confirmRename() {
     const trimmed = draftName.trim()
-    if (!trimmed || trimmed === room.name) {
+    if (!trimmed || trimmed === roomName) {
       setEditingName(false)
       return
     }
@@ -115,6 +122,7 @@ export function RoomDetailPanel({
     try {
       await updateRoom(room.id, { name: trimmed })
       toast.success('Pièce renommée')
+      setRoomName(trimmed)
       setEditingName(false)
       router.refresh()
     } catch (error) {
@@ -125,7 +133,7 @@ export function RoomDetailPanel({
   }
 
   function cancelRename() {
-    setDraftName(room.name)
+    setDraftName(roomName)
     setEditingName(false)
   }
 
@@ -174,7 +182,7 @@ export function RoomDetailPanel({
             </div>
           ) : (
             <div className="flex items-center gap-2 pr-8">
-              <SheetTitle>{room.name}</SheetTitle>
+              <SheetTitle>{roomName}</SheetTitle>
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -210,6 +218,7 @@ export function RoomDetailPanel({
                   unitSlug={unitSlug}
                   roomId={room.id}
                   label="Ajouter"
+                  onSuccess={refresh}
                 />
               </div>
               {loading ? (
@@ -225,7 +234,12 @@ export function RoomDetailPanel({
             <TabsContent value="work-orders" className="space-y-3 pt-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">Travaux de la pièce</p>
-                <AddWorkOrderButton unitId={unitId} roomId={room.id} label="Ajouter" />
+                <AddWorkOrderButton
+                  unitId={unitId}
+                  roomId={room.id}
+                  label="Ajouter"
+                  onSuccess={refresh}
+                />
               </div>
               {loading ? (
                 <div className="space-y-2">
