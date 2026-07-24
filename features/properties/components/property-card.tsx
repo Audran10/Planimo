@@ -59,7 +59,7 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
     <>
       <Card
         onClick={() => router.push(`/properties/${property.slug}`)}
-        className="relative cursor-pointer rounded-xl border border-border transition-all duration-200 hover:shadow-md"
+        className="relative cursor-pointer rounded-xl border border-border transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
       >
         <div
           className="absolute top-3 right-3"
@@ -117,7 +117,13 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
 
           <div className="flex items-center justify-between">
             <Badge variant="secondary">{propertyTypeLabels[property.type]}</Badge>
-            <Badge variant={property.role === 'owner' ? 'default' : 'outline'}>
+            <Badge
+              className={
+                property.role === 'owner'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+              }
+            >
               {property.role === 'owner' ? 'Propriétaire' : 'Membre'}
             </Badge>
           </div>

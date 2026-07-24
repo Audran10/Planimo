@@ -37,7 +37,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const title = crumbs[crumbs.length - 1]?.label ?? 'Dashboard'
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur transition-all duration-200 lg:px-6">
+    <header className="flex h-12 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur transition-all duration-200 lg:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -49,7 +49,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       </Button>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
           {crumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="flex items-center gap-1">
               {index > 0 && <ChevronRight className="h-3 w-3" aria-hidden="true" />}
@@ -63,7 +63,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             </span>
           ))}
         </div>
-        <h1 className="truncate text-sm font-semibold">{title}</h1>
+        <h1 className="truncate text-base font-semibold">{title}</h1>
       </div>
 
       <div className="ml-auto flex items-center gap-1">

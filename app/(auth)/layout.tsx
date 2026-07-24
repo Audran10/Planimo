@@ -1,3 +1,4 @@
+import { Logo } from '@/core/components/shared/logo'
 import { ThemeToggle } from '@/core/components/shared/theme-toggle'
 
 export default function AuthLayout({
@@ -17,11 +18,8 @@ export default function AuthLayout({
         {/* Panneau gauche — branding (caché sur mobile) */}
         <div className="hidden lg:flex lg:w-1/2 bg-primary/5 border-r border-border flex-col justify-between p-12">
           <div>
-            <div className="flex items-center gap-2 mb-12">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">P</span>
-              </div>
-              <span className="font-semibold text-lg">planimo</span>
+            <div className="mb-12">
+              <Logo />
             </div>
             <h1 className="text-3xl font-bold text-foreground leading-tight mb-4">
               Gérez votre patrimoine<br />
