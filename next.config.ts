@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -60,6 +61,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' blob: data: https://*.supabase.co",
               "font-src 'self'",
               "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
+              "worker-src 'self' blob:",
               "frame-ancestors 'none'",
             ].join('; '),
           },
@@ -69,4 +71,16 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default Sentry.withSentryConfig(nextConfig, {
+  org: 'audran-latorre',
+  project: 'planimo',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: '/monitoring',
+  webpack: {
+    automaticVercelMonitors: true,
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+})
