@@ -54,7 +54,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "dotenv": "^17.4.2",
     "eslint": "^9",
-    "eslint-config-next": "16.2.11",
+    "eslint-config-next": "16.2.12",
     "happy-dom": "^20.10.6",
     "tailwindcss": "^4",
     "typescript": "^5",
