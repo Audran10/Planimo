@@ -19,7 +19,7 @@
     "@anthropic-ai/sdk": "^0.112.3",
     "@base-ui/react": "^1.6.0",
     "@better-auth/prisma-adapter": "^1.6.23",
-    "@hookform/resolvers": "^5.4.0",
+    "@hookform/resolvers": "^5.5.7",
     "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "7.9.0",
     "@radix-ui/react-label": "^2.1.11",
