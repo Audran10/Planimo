@@ -1,5 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+let client: Anthropic | null = null
+let cachedKey: string | undefined
+
+export function getAnthropic(): Anthropic {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!client || cachedKey !== apiKey) {
+    client = new Anthropic({ apiKey })
+    cachedKey = apiKey
+  }
+  return client
+}

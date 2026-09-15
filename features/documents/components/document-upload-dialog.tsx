@@ -51,6 +51,7 @@ interface DocumentUploadDialogProps {
   unitId?: string
   roomId?: string
   tenantId?: string
+  workOrderId?: string
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
@@ -62,6 +63,7 @@ export function DocumentUploadDialog({
   unitId,
   roomId,
   tenantId,
+  workOrderId,
   open,
   onOpenChange,
   onSuccess,
@@ -73,7 +75,14 @@ export function DocumentUploadDialog({
 
   const form = useForm<DocumentFormValues>({
     resolver: zodResolver(documentSchema),
-    defaultValues: { name: '', type: 'other', unitId, roomId, tenantId },
+    defaultValues: {
+      name: '',
+      type: workOrderId ? 'invoice' : 'other',
+      unitId,
+      roomId,
+      tenantId,
+      workOrderId,
+    },
   })
 
   async function onSubmit(values: DocumentFormValues) {
@@ -102,13 +111,21 @@ export function DocumentUploadDialog({
         unitId,
         roomId,
         tenantId,
+        workOrderId,
         fileUrl: uploaded.url,
         fileType: uploaded.fileType,
         fileSize: uploaded.fileSize,
       })
 
       toast.success('Document ajouté avec succès')
-      form.reset({ name: '', type: 'other', unitId, roomId, tenantId })
+      form.reset({
+        name: '',
+        type: workOrderId ? 'invoice' : 'other',
+        unitId,
+        roomId,
+        tenantId,
+        workOrderId,
+      })
       setFile(null)
       onOpenChange(false)
       onSuccess?.()

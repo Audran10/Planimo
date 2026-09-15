@@ -23,6 +23,12 @@
 # production
 /build
 
+# uploads locaux (dev sans Supabase)
+/uploads
+
+# logs du serveur de dev
+/dev.log
+
 # misc
 .DS_Store
 *.pem

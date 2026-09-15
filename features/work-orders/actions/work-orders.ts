@@ -4,19 +4,27 @@ import { prisma } from '@/core/lib/db'
 import { auth } from '@/core/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { uploadFile } from '@/core/lib/storage'
 import { checkPropertyAccess } from '@/features/members/actions/members'
+import { canWriteProperty } from '@/features/members/lib/permissions'
 import { workOrderSchema } from '../schemas/work-order.schema'
+import {
+  MAX_FILE_SIZE,
+  hasDangerousExtension,
+  isAllowedContentType,
+} from '@/features/documents/lib/file-validation'
+import {
+  buildDocumentFilename,
+  documentNameFromFile,
+} from '@/features/documents/lib/build-filename'
 import type { CreateWorkOrderInput, UpdateWorkOrderInput, WorkOrder } from '../types'
-import type { MemberRole, WorkOrderStatus } from '@/core/types'
+import type { WorkOrderStatus, DocumentType } from '@/core/types'
+import type { Document } from '@/features/documents/types'
 
 async function requireSession() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Non authentifié')
   return session
-}
-
-function canManageWorkOrder(role: MemberRole | 'owner' | null) {
-  return role === 'owner' || role === 'admin' || role === 'editor'
 }
 
 function revalidateWorkOrderPaths() {
@@ -80,12 +88,17 @@ export async function getWorkOrdersByUnitId(unitId: string): Promise<WorkOrder[]
 
   const workOrders = await prisma.workOrder.findMany({
     where: { OR: [{ unitId }, { room: { unitId } }] },
+    include: { documents: { orderBy: { createdAt: 'desc' } } },
     orderBy: { createdAt: 'desc' },
   })
 
   return workOrders.map((workOrder) => ({
     ...workOrder,
     status: workOrder.status as WorkOrderStatus,
+    documents: workOrder.documents.map((document) => ({
+      ...document,
+      type: document.type as DocumentType,
+    })),
   }))
 }
 
@@ -96,7 +109,7 @@ export async function createWorkOrder(input: CreateWorkOrderInput) {
 
   const propertyId = await resolvePropertyId(data)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageWorkOrder(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour ajouter une intervention')
   }
 
@@ -112,7 +125,7 @@ export async function updateWorkOrder(workOrderId: string, input: UpdateWorkOrde
 
   const propertyId = await resolveWorkOrderPropertyId(workOrderId)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageWorkOrder(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants')
   }
 
@@ -133,11 +146,93 @@ export async function deleteWorkOrder(workOrderId: string) {
 
   const propertyId = await resolveWorkOrderPropertyId(workOrderId)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageWorkOrder(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour supprimer cette intervention')
   }
 
   await prisma.workOrder.delete({ where: { id: workOrderId } })
 
   revalidateWorkOrderPaths()
+}
+
+const DOCUMENTS_BUCKET = 'documents'
+
+export async function attachFilesToWorkOrder(
+  workOrderId: string,
+  formData: FormData
+): Promise<Document[]> {
+  const session = await requireSession()
+
+  const workOrder = await prisma.workOrder.findUnique({
+    where: { id: workOrderId },
+    include: {
+      unit: {
+        select: {
+          id: true,
+          slug: true,
+          propertyId: true,
+          property: { select: { slug: true } },
+        },
+      },
+      room: {
+        select: {
+          unit: {
+            select: {
+              id: true,
+              slug: true,
+              propertyId: true,
+              property: { select: { slug: true } },
+            },
+          },
+        },
+      },
+    },
+  })
+  if (!workOrder) throw new Error('Intervention introuvable')
+
+  const unit = workOrder.unit ?? workOrder.room?.unit
+  if (!unit) throw new Error('Intervention non rattachée à un bien')
+
+  const access = await checkPropertyAccess(unit.propertyId, session.user.id)
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
+    throw new Error('Droits insuffisants')
+  }
+
+  const files = formData
+    .getAll('files')
+    .filter((entry): entry is File => entry instanceof File)
+  if (files.length === 0) throw new Error('Aucun fichier sélectionné')
+
+  const created: Document[] = []
+  for (const file of files) {
+    if (hasDangerousExtension(file.name)) {
+      throw new Error('Type de fichier non autorisé')
+    }
+    if (!isAllowedContentType(file.type)) {
+      throw new Error('Type de fichier non autorisé (PDF ou image uniquement)')
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error('Le fichier dépasse la taille maximale de 10 Mo')
+    }
+
+    const path = `${session.user.id}/${unit.property.slug}/${unit.slug}/work-orders/${workOrderId}/${buildDocumentFilename(file.name)}`
+    const url = await uploadFile(file, DOCUMENTS_BUCKET, path)
+    const document = await prisma.document.create({
+      data: {
+        name: documentNameFromFile(file.name),
+        type: 'other',
+        workOrderId,
+        unitId: unit.id,
+        fileUrl: url,
+        fileType: file.type,
+        fileSize: file.size,
+      },
+    })
+    created.push({ ...document, type: 'other' })
+  }
+
+  revalidateWorkOrderPaths()
+  revalidatePath('/documents')
+
+  return created
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Building2, Euro, MoreVertical, Pencil, Trash2, Wrench } from 'lucide-react'
+import { Building2, Euro, FileText, MoreVertical, Pencil, Trash2, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/core/components/ui/badge'
 import { Button } from '@/core/components/ui/button'
@@ -25,7 +25,10 @@ import {
 } from '@/core/components/ui/alert-dialog'
 import { deleteWorkOrder, updateWorkOrder } from '@/features/work-orders/actions/work-orders'
 import { WorkOrderFormDialog } from '@/features/work-orders/components/work-order-form-dialog'
+import { AttachWorkOrderFilesButton } from '@/features/work-orders/components/attach-work-order-files-button'
+import { DocumentList } from '@/features/documents/components/document-list'
 import type { WorkOrder } from '@/features/work-orders/types'
+import type { Document } from '@/features/documents/types'
 
 const statusLabels: Record<WorkOrder['status'], string> = {
   pending: 'En attente',
@@ -47,12 +50,28 @@ const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
 
 const amountFormatter = new Intl.NumberFormat('fr-FR')
 
-export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
+export function WorkOrderCard({
+  workOrder,
+  canWrite = false,
+  onDocumentsChange,
+}: {
+  workOrder: WorkOrder
+  canWrite?: boolean
+  propertySlug?: string
+  unitSlug?: string
+  unitId?: string
+  onDocumentsChange?: () => void
+}) {
   const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const [documents, setDocuments] = useState<Document[]>(workOrder.documents ?? [])
+
+  useEffect(() => {
+    setDocuments(workOrder.documents ?? [])
+  }, [workOrder.documents])
 
   async function handleDelete() {
     setDeleting(true)
@@ -88,7 +107,8 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
   return (
     <>
       <div className="relative rounded-xl border border-border p-4">
-        <div className="absolute top-3 right-3">
+        {canWrite && (
+          <div className="absolute top-3 right-3">
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="Options"
@@ -129,7 +149,8 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+          </div>
+        )}
 
         <div className="flex items-start gap-3 pr-10">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
@@ -159,15 +180,53 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
                 {dateFormatter.format(workOrder.interventionDate)}
               </p>
             )}
+            {(documents.length > 0 || canWrite) && (
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                    <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                    Document{documents.length > 1 ? 's' : ''}
+                  </p>
+                  {canWrite && (
+                    <AttachWorkOrderFilesButton
+                      workOrderId={workOrder.id}
+                      onAttached={(added) => {
+                        setDocuments((current) => [...added, ...current])
+                        onDocumentsChange?.()
+                        router.refresh()
+                      }}
+                    />
+                  )}
+                </div>
+                {documents.length > 0 && (
+                  <DocumentList
+                    documents={documents}
+                    canWrite={canWrite}
+                    onDeleted={(documentId) => {
+                      setDocuments((current) =>
+                        current.filter((document) => document.id !== documentId)
+                      )
+                      onDocumentsChange?.()
+                    }}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
+      {canWrite && (
+        <>
       <WorkOrderFormDialog
         mode="edit"
         workOrder={workOrder}
         open={editOpen}
         onOpenChange={setEditOpen}
+        onSuccess={() => {
+          onDocumentsChange?.()
+          router.refresh()
+        }}
       />
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -191,6 +250,8 @@ export function WorkOrderCard({ workOrder }: { workOrder: WorkOrder }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </>
+      )}
     </>
   )
 }

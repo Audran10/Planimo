@@ -25,6 +25,7 @@ import {
 } from '@/core/components/ui/alert-dialog'
 import { deleteProperty } from '@/features/properties/actions/properties'
 import { PropertyFormDialog } from '@/features/properties/components/property-form-dialog'
+import { canAdminProperty, canOwnProperty } from '@/features/members/lib/permissions'
 import type { PropertyWithMeta } from '@/features/properties/types'
 import { propertyTypeIcons, propertyTypeLabels } from '@/features/properties/constants'
 import { getUnitLabel } from '@/core/lib/property-labels'
@@ -36,8 +37,8 @@ export function PropertyCard({ property }: { property: PropertyWithMeta }) {
   const [deleting, setDeleting] = useState(false)
 
   const Icon = propertyTypeIcons[property.type]
-  const canEdit = property.role === 'owner' || property.role === 'admin'
-  const canDelete = property.role === 'owner'
+  const canEdit = canAdminProperty(property.role)
+  const canDelete = canOwnProperty(property.role)
 
   async function handleDelete() {
     setDeleting(true)

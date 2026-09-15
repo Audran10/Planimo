@@ -36,38 +36,28 @@ import {
   inviteMemberSchema,
   type InviteMemberFormValues,
 } from '@/features/members/schemas/invite-member.schema'
-
-const roleOptions: {
-  value: InviteMemberFormValues['role']
-  label: string
-  description: string
-}[] = [
-  {
-    value: 'admin',
-    label: 'Administrateur',
-    description: 'Peut modifier le bien et inviter des membres',
-  },
-  {
-    value: 'editor',
-    label: 'Éditeur',
-    description: 'Peut ajouter et modifier les données',
-  },
-  {
-    value: 'viewer',
-    label: 'Lecteur',
-    description: 'Peut consulter uniquement',
-  },
-]
+import { MEMBER_ROLE_OPTIONS } from '@/features/members/constants'
+import { canInviteAs } from '@/features/members/lib/permissions'
+import type { PropertyRole } from '@/features/properties/types'
 
 interface InviteDialogProps {
   propertyId: string
+  actorRole: PropertyRole
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function InviteDialog({ propertyId, open, onOpenChange }: InviteDialogProps) {
+export function InviteDialog({
+  propertyId,
+  actorRole,
+  open,
+  onOpenChange,
+}: InviteDialogProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const roleOptions = MEMBER_ROLE_OPTIONS.filter((option) =>
+    canInviteAs(actorRole, option.value)
+  )
 
   const form = useForm<InviteMemberFormValues>({
     resolver: zodResolver(inviteMemberSchema),

@@ -57,11 +57,13 @@ export function TenantCard({
   unitId,
   propertySlug,
   unitSlug,
+  canWrite = false,
 }: {
   tenant: TenantSummary
   unitId: string
   propertySlug: string
   unitSlug: string
+  canWrite?: boolean
 }) {
   const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
@@ -89,7 +91,8 @@ export function TenantCard({
   return (
     <>
       <div className="relative rounded-xl border border-border p-4">
-        <div className="absolute top-3 right-3 flex items-center gap-1">
+        {canWrite && (
+          <div className="absolute top-3 right-3 flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -108,7 +111,8 @@ export function TenantCard({
           >
             <Trash2 className="h-4 w-4" aria-hidden="true" />
           </Button>
-        </div>
+          </div>
+        )}
 
         <div className="flex items-start gap-3 pr-16">
           <Avatar size="lg">
@@ -172,6 +176,8 @@ export function TenantCard({
         </div>
       </div>
 
+      {canWrite && (
+        <>
       <TenantFormDialog
         mode="edit"
         unitId={unitId}
@@ -203,6 +209,8 @@ export function TenantCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </>
+      )}
     </>
   )
 }

@@ -26,7 +26,15 @@ const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
 })
 
-function DocumentRow({ document }: { document: Document }) {
+function DocumentRow({
+  document,
+  canWrite,
+  onDeleted,
+}: {
+  document: Document
+  canWrite: boolean
+  onDeleted?: (documentId: string) => void
+}) {
   const router = useRouter()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -37,6 +45,7 @@ function DocumentRow({ document }: { document: Document }) {
       await deleteDocument(document.id)
       toast.success('Document supprimé')
       setDeleteOpen(false)
+      onDeleted?.(document.id)
       router.refresh()
     } catch (error) {
       toast.error(
@@ -72,17 +81,20 @@ function DocumentRow({ document }: { document: Document }) {
         >
           <Download className="h-4 w-4" aria-hidden="true" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Supprimer"
-          className="cursor-pointer text-muted-foreground hover:text-destructive"
-          onClick={() => setDeleteOpen(true)}
-        >
-          <Trash2 className="h-4 w-4" aria-hidden="true" />
-        </Button>
+        {canWrite && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Supprimer"
+            className="cursor-pointer text-muted-foreground hover:text-destructive"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        )}
       </li>
 
+      {canWrite && (
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -104,11 +116,20 @@ function DocumentRow({ document }: { document: Document }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
     </>
   )
 }
 
-export function DocumentList({ documents }: { documents: Document[] }) {
+export function DocumentList({
+  documents,
+  canWrite = false,
+  onDeleted,
+}: {
+  documents: Document[]
+  canWrite?: boolean
+  onDeleted?: (documentId: string) => void
+}) {
   if (documents.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
@@ -121,7 +142,12 @@ export function DocumentList({ documents }: { documents: Document[] }) {
   return (
     <ul className="divide-y divide-border">
       {documents.map((document) => (
-        <DocumentRow key={document.id} document={document} />
+        <DocumentRow
+          key={document.id}
+          document={document}
+          canWrite={canWrite}
+          onDeleted={onDeleted}
+        />
       ))}
     </ul>
   )

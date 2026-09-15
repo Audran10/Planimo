@@ -33,6 +33,7 @@ import {
 } from '@/core/components/ui/alert-dialog'
 import { deleteUnit } from '@/features/units/actions/units'
 import { UnitFormDialog } from '@/features/units/components/unit-form-dialog'
+import { canAdminProperty, canWriteProperty } from '@/features/members/lib/permissions'
 import type { UnitWithMeta } from '@/features/units/types'
 import type { PropertyRole } from '@/features/properties/types'
 import { getUnitLabel } from '@/core/lib/property-labels'
@@ -56,9 +57,8 @@ export function UnitCard({
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  const canEdit =
-    propertyRole === 'owner' || propertyRole === 'admin' || propertyRole === 'editor'
-  const canDelete = propertyRole === 'owner' || propertyRole === 'admin'
+  const canEdit = canWriteProperty(propertyRole)
+  const canDelete = canAdminProperty(propertyRole)
   const href = `/properties/${propertySlug}/units/${unit.slug}`
   const unitLabel = getUnitLabel(propertyType)
 

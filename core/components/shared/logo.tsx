@@ -8,7 +8,7 @@ export function Logo() {
           <rect x="2" y="5" width="8" height="2" rx="1" fill="white" fillOpacity="0.6" />
         </svg>
       </div>
-      <span className="text-lg font-semibold tracking-tight">planimo</span>
+      <span className="text-lg font-semibold tracking-tight">Planimo</span>
     </div>
   )
 }

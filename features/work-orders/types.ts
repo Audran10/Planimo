@@ -1,4 +1,5 @@
 import type { WorkOrderStatus } from '@/core/types'
+import type { Document } from '@/features/documents/types'
 
 export interface WorkOrder {
   id: string
@@ -11,6 +12,7 @@ export interface WorkOrder {
   status: WorkOrderStatus
   createdAt: Date
   updatedAt: Date
+  documents?: Document[]
 }
 
 export interface CreateWorkOrderInput {

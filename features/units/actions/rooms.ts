@@ -5,17 +5,13 @@ import { auth } from '@/core/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { checkPropertyAccess } from '@/features/members/actions/members'
-import type { MemberRole } from '@/core/types'
+import { canWriteProperty } from '@/features/members/lib/permissions'
 import type { RoomTechnicalInfo, RoomWithMeta, UpdateRoomInput } from '../types'
 
 async function requireSession() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Non authentifié')
   return session
-}
-
-function canManageRoom(role: MemberRole | 'owner' | null) {
-  return role === 'owner' || role === 'admin' || role === 'editor'
 }
 
 async function resolveRoomPropertyId(roomId: string) {
@@ -58,7 +54,7 @@ export async function updateRoom(roomId: string, input: UpdateRoomInput) {
 
   const propertyId = await resolveRoomPropertyId(roomId)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageRoom(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants')
   }
 
@@ -88,7 +84,7 @@ export async function deleteRoom(roomId: string) {
 
   const propertyId = await resolveRoomPropertyId(roomId)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageRoom(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour supprimer cette pièce')
   }
 

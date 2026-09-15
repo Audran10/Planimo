@@ -16,14 +16,10 @@ import { Button } from '@/core/components/ui/button'
 import { Skeleton } from '@/core/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/core/components/ui/tabs'
 import { useDebounce } from '@/core/hooks/use-debounce'
-import { getDocumentsByRoomId } from '@/features/documents/actions/documents'
-import { DocumentList } from '@/features/documents/components/document-list'
-import { AddDocumentButton } from '@/features/documents/components/add-document-button'
 import { getWorkOrdersByUnitId } from '@/features/work-orders/actions/work-orders'
 import { WorkOrderCard } from '@/features/work-orders/components/work-order-card'
 import { AddWorkOrderButton } from '@/features/work-orders/components/add-work-order-button'
 import { updateRoom } from '@/features/units/actions/rooms'
-import type { Document } from '@/features/documents/types'
 import type { WorkOrder } from '@/features/work-orders/types'
 import type { RoomWithMeta } from '@/features/units/types'
 
@@ -34,19 +30,18 @@ interface RoomDetailPanelProps {
   unitSlug: string
   open: boolean
   onClose: () => void
+  canWrite?: boolean
 }
 
 export function RoomDetailPanel({
   room,
   unitId,
-  propertySlug,
-  unitSlug,
   open,
   onClose,
+  canWrite = false,
 }: RoomDetailPanelProps) {
   const router = useRouter()
 
-  const [documents, setDocuments] = useState<Document[]>([])
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -77,9 +72,8 @@ export function RoomDetailPanel({
     notes !== debouncedNotes
 
   useEffect(() => {
-    Promise.all([getDocumentsByRoomId(room.id), getWorkOrdersByUnitId(unitId)])
-      .then(([docs, allWorkOrders]) => {
-        setDocuments(docs)
+    getWorkOrdersByUnitId(unitId)
+      .then((allWorkOrders) => {
         setWorkOrders(allWorkOrders.filter((workOrder) => workOrder.roomId === room.id))
       })
       .catch(() => {
@@ -89,6 +83,7 @@ export function RoomDetailPanel({
   }, [room.id, unitId, refreshKey])
 
   useEffect(() => {
+    if (!canWrite) return
     if (isFirstTechnicalRender.current) {
       isFirstTechnicalRender.current = false
       return
@@ -104,7 +99,7 @@ export function RoomDetailPanel({
       .catch(() => {
         toast.error('Erreur lors de la sauvegarde')
       })
-  }, [room.id, debouncedPaintRef, debouncedDimensions, debouncedNotes])
+  }, [canWrite, room.id, debouncedPaintRef, debouncedDimensions, debouncedNotes])
 
   function startEditingName() {
     setDraftName(roomName)
@@ -183,6 +178,7 @@ export function RoomDetailPanel({
           ) : (
             <div className="flex items-center gap-2 pr-8">
               <SheetTitle>{roomName}</SheetTitle>
+              {canWrite && (
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -192,16 +188,14 @@ export function RoomDetailPanel({
               >
                 <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
               </Button>
+              )}
             </div>
           )}
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
-          <Tabs defaultValue="documents">
+          <Tabs defaultValue="work-orders">
             <TabsList className="w-full">
-              <TabsTrigger value="documents" className="flex-1">
-                Documents
-              </TabsTrigger>
               <TabsTrigger value="work-orders" className="flex-1">
                 Travaux
               </TabsTrigger>
@@ -210,36 +204,17 @@ export function RoomDetailPanel({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="documents" className="space-y-3 pt-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Documents de la pièce</p>
-                <AddDocumentButton
-                  propertySlug={propertySlug}
-                  unitSlug={unitSlug}
-                  roomId={room.id}
-                  label="Ajouter"
-                  onSuccess={refresh}
-                />
-              </div>
-              {loading ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              ) : (
-                <DocumentList documents={documents} />
-              )}
-            </TabsContent>
-
             <TabsContent value="work-orders" className="space-y-3 pt-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">Travaux de la pièce</p>
+                {canWrite && (
                 <AddWorkOrderButton
                   unitId={unitId}
                   roomId={room.id}
                   label="Ajouter"
                   onSuccess={refresh}
                 />
+                )}
               </div>
               {loading ? (
                 <div className="space-y-2">
@@ -253,7 +228,13 @@ export function RoomDetailPanel({
               ) : (
                 <div className="space-y-3">
                   {workOrders.map((workOrder) => (
-                    <WorkOrderCard key={workOrder.id} workOrder={workOrder} />
+                    <WorkOrderCard
+                      key={workOrder.id}
+                      workOrder={workOrder}
+                      canWrite={canWrite}
+                      unitId={unitId}
+                      onDocumentsChange={refresh}
+                    />
                   ))}
                 </div>
               )}
@@ -276,6 +257,7 @@ export function RoomDetailPanel({
                   placeholder="Ex: Dulux blanc cassé 7023-Y, finition mate"
                   value={paintRef}
                   onChange={(event) => setPaintRef(event.target.value)}
+                  readOnly={!canWrite}
                 />
               </div>
 
@@ -285,6 +267,7 @@ export function RoomDetailPanel({
                   placeholder="Ex: L 4,2m × l 3,1m, hauteur 2,5m"
                   value={dimensions}
                   onChange={(event) => setDimensions(event.target.value)}
+                  readOnly={!canWrite}
                 />
               </div>
 
@@ -294,6 +277,7 @@ export function RoomDetailPanel({
                   placeholder="Informations complémentaires..."
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
+                  readOnly={!canWrite}
                 />
               </div>
             </TabsContent>
