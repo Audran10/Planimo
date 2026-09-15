@@ -5,6 +5,7 @@ export interface Document {
   unitId?: string | null
   roomId?: string | null
   tenantId?: string | null
+  workOrderId?: string | null
   name: string
   fileUrl: string
   fileType: string
@@ -23,6 +24,7 @@ export interface CreateDocumentInput {
   unitId?: string
   roomId?: string
   tenantId?: string
+  workOrderId?: string
 }
 
 export interface DocumentListItem extends Document {

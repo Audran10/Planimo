@@ -5,32 +5,22 @@ import Link from 'next/link'
 import {
   Building2,
   FileText,
-  FileUp,
   Home,
   Inbox,
-  Plus,
-  UserPlus,
   Users,
   type LucideIcon,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/core/components/ui/card'
-import { Button } from '@/core/components/ui/button'
 import { getProperties } from '@/features/properties/actions/properties'
 import { getAllTenants } from '@/features/tenants/actions/tenants'
 import { isTenantActive } from '@/features/tenants/lib/tenant-status'
 import { getAllDocuments } from '@/features/documents/actions/documents'
 
-const quickActions = [
-  { label: 'Ajouter un bien', icon: Plus, href: '/properties' },
-  { label: 'Ajouter un locataire', icon: UserPlus, href: '/tenants' },
-  { label: 'Importer un document', icon: FileUp, href: '/documents' },
-]
-
 interface StatItem {
   label: string
   value: number
   icon: LucideIcon
-  hint: string
+  hint?: string
   href?: string
   borderColor: string
   iconBg: string
@@ -41,32 +31,42 @@ function StatCard(stat: StatItem) {
   const content = (
     <Card
       className={
-        `border border-border border-l-4 ${stat.borderColor} shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:shadow-md` +
+        `h-full border border-border border-l-4 ${stat.borderColor} shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:shadow-md` +
         (stat.href ? ' cursor-pointer' : '')
       }
     >
-      <CardHeader className="flex-row items-start justify-between">
-        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-          {stat.label}
-        </p>
-        <div className={`flex h-9 w-9 items-center justify-center rounded-lg p-2 ${stat.iconBg}`}>
-          <stat.icon className={`h-4 w-4 ${stat.iconColor}`} aria-hidden="true" />
+      <CardHeader>
+        <div className="flex items-center gap-2.5">
+          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${stat.iconBg}`}>
+            <stat.icon className={`h-4 w-4 ${stat.iconColor}`} aria-hidden="true" />
+          </div>
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            {stat.label}
+          </p>
         </div>
       </CardHeader>
       <CardContent>
         <p className="text-4xl font-bold">{stat.value}</p>
-        {stat.href ? (
-          <p className="mt-2 text-xs text-primary hover:underline">
+        {stat.href && stat.hint ? (
+          <p className="mt-2 min-h-4 truncate text-xs text-primary hover:underline">
             + {stat.hint}
           </p>
         ) : (
-          <p className="mt-2 text-xs text-muted-foreground">{stat.hint}</p>
+          <p className="mt-2 min-h-4 truncate text-xs text-muted-foreground">
+            {stat.hint ?? '\u00a0'}
+          </p>
         )}
       </CardContent>
     </Card>
   )
 
-  return stat.href ? <Link href={stat.href}>{content}</Link> : content
+  return stat.href ? (
+    <Link href={stat.href} className="block h-full">
+      {content}
+    </Link>
+  ) : (
+    content
+  )
 }
 
 export default async function DashboardPage() {
@@ -108,7 +108,6 @@ export default async function DashboardPage() {
       label: 'Locataires',
       value: activeTenantsCount,
       icon: Users,
-      hint: 'Ajouter un locataire',
       href: '/tenants',
       borderColor: 'border-l-amber-500',
       iconBg: 'bg-amber-50 dark:bg-amber-950',
@@ -118,7 +117,6 @@ export default async function DashboardPage() {
       label: 'Documents',
       value: documents.length,
       icon: FileText,
-      hint: 'Importer un document',
       href: '/documents',
       borderColor: 'border-l-violet-500',
       iconBg: 'bg-violet-50 dark:bg-violet-950',
@@ -152,41 +150,19 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="border border-border lg:col-span-2">
-          <CardHeader>
-            <p className="text-sm font-medium">Activité récente</p>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-              <Inbox className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
-              <p className="text-sm text-muted-foreground">
-                Aucune activité pour le moment
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border">
-          <CardHeader>
-            <p className="text-sm font-medium">Accès rapides</p>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {quickActions.map((action) => (
-              <Button
-                key={action.label}
-                variant="ghost"
-                nativeButton={false}
-                render={<Link href={action.href} />}
-                className="w-full cursor-pointer justify-start gap-2 border border-border transition-all duration-200"
-              >
-                <action.icon className="h-4 w-4" aria-hidden="true" />
-                {action.label}
-              </Button>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="border border-border">
+        <CardHeader>
+          <p className="text-sm font-medium">Activité récente</p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+            <Inbox className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+            <p className="text-sm text-muted-foreground">
+              Aucune activité pour le moment
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

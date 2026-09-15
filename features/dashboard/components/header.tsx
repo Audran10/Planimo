@@ -37,7 +37,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const title = crumbs[crumbs.length - 1]?.label ?? 'Dashboard'
 
   return (
-    <header className="flex h-12 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur transition-all duration-200 lg:px-6">
+    <header className="flex h-12 shrink-0 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur transition-all duration-200 lg:px-6">
       <Button
         variant="ghost"
         size="icon"

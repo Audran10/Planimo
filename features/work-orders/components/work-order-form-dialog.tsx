@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { FileText, FileUp, Loader2, X } from 'lucide-react'
 import { Button } from '@/core/components/ui/button'
 import { Input } from '@/core/components/ui/input'
 import { Textarea } from '@/core/components/ui/textarea'
@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/core/components/ui/select'
-import { createWorkOrder, updateWorkOrder } from '@/features/work-orders/actions/work-orders'
+import { attachFilesToWorkOrder, createWorkOrder, updateWorkOrder } from '@/features/work-orders/actions/work-orders'
 import {
   workOrderSchema,
   type WorkOrderFormValues,
@@ -95,25 +95,38 @@ export function WorkOrderFormDialog({
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+  const [files, setFiles] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<WorkOrderInput, unknown, WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: defaultValuesFor(workOrder, unitId, roomId),
   })
 
-  useEffect(() => {
+  const formResetKey = `${open}:${workOrder?.id ?? 'new'}:${unitId ?? ''}:${roomId ?? ''}`
+  const [seenFormResetKey, setSeenFormResetKey] = useState(formResetKey)
+  if (formResetKey !== seenFormResetKey) {
+    setSeenFormResetKey(formResetKey)
     if (open) {
       form.reset(defaultValuesFor(workOrder, unitId, roomId))
+      setFiles([])
     }
-  }, [open, workOrder, unitId, roomId, form])
+  }
 
   // Clear the error banner on close (an event, not a render-time sync) so a
   // stale error never reappears the next time the dialog is opened.
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setServerError(null)
+      setFiles([])
     }
     onOpenChange(nextOpen)
+  }
+
+  function addFiles(fileList: FileList | null) {
+    if (!fileList || fileList.length === 0) return
+    setFiles((current) => [...current, ...Array.from(fileList)])
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function onSubmit(values: WorkOrderFormValues) {
@@ -122,9 +135,19 @@ export function WorkOrderFormDialog({
     try {
       if (mode === 'edit' && workOrder) {
         await updateWorkOrder(workOrder.id, values)
+        if (files.length > 0) {
+          const formData = new FormData()
+          for (const file of files) formData.append('files', file)
+          await attachFilesToWorkOrder(workOrder.id, formData)
+        }
         toast.success('Intervention mise à jour')
       } else {
-        await createWorkOrder(values)
+        const created = await createWorkOrder(values)
+        if (files.length > 0) {
+          const formData = new FormData()
+          for (const file of files) formData.append('files', file)
+          await attachFilesToWorkOrder(created.id, formData)
+        }
         toast.success('Intervention ajoutée avec succès')
       }
       handleOpenChange(false)
@@ -290,6 +313,59 @@ export function WorkOrderFormDialog({
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="space-y-2">
+              <FormLabel>Documents</FormLabel>
+              <input
+                key={formResetKey}
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf,image/*"
+                multiple
+                className="hidden"
+                disabled={loading}
+                onChange={(event) => addFiles(event.target.files)}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="cursor-pointer gap-2"
+                disabled={loading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FileUp className="h-4 w-4" aria-hidden="true" />
+                Joindre des fichiers
+              </Button>
+              {files.length > 0 && (
+                <ul className="space-y-1.5">
+                  {files.map((file, index) => (
+                    <li
+                      key={`${file.name}-${file.size}-${index}`}
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm"
+                    >
+                      <FileText className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      <span className="min-w-0 flex-1 truncate">{file.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Retirer ${file.name}`}
+                        className="cursor-pointer shrink-0"
+                        disabled={loading}
+                        onClick={() =>
+                          setFiles((current) => current.filter((_, i) => i !== index))
+                        }
+                      >
+                        <X className="h-4 w-4" aria-hidden="true" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-xs text-muted-foreground">
+                PDF ou image · 10 Mo max · plusieurs fichiers possibles
+              </p>
             </div>
 
             <DialogFooter>

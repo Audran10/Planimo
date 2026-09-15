@@ -1,10 +1,15 @@
 import { Building2 } from 'lucide-react'
 import { getProperties } from '@/features/properties/actions/properties'
+import { getPendingInvitations } from '@/features/members/actions/members'
+import { PendingInvitations } from '@/features/members/components/pending-invitations'
 import { PropertyList } from '@/features/properties/components/property-list'
 import { NewPropertyButton } from '@/features/properties/components/new-property-button'
 
 export default async function PropertiesPage() {
-  const properties = await getProperties()
+  const [properties, invitations] = await Promise.all([
+    getProperties(),
+    getPendingInvitations(),
+  ])
 
   return (
     <div className="space-y-6">
@@ -17,6 +22,8 @@ export default async function PropertiesPage() {
         </div>
         {properties.length > 0 && <NewPropertyButton />}
       </div>
+
+      <PendingInvitations invitations={invitations} />
 
       {properties.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-24 text-center">

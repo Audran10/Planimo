@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader } from '@/core/components/ui/card'
+import { canWriteProperty } from '@/features/members/lib/permissions'
 import { TenantSection } from '@/features/tenants/components/tenant-section'
 import { getTenantByUnitId } from '@/features/tenants/actions/tenants'
 import { DocumentList } from '@/features/documents/components/document-list'
@@ -6,8 +7,7 @@ import { AddDocumentButton } from '@/features/documents/components/add-document-
 import { WorkOrderList } from '@/features/work-orders/components/work-order-list'
 import { AddWorkOrderButton } from '@/features/work-orders/components/add-work-order-button'
 import { getWorkOrdersByUnitId } from '@/features/work-orders/actions/work-orders'
-import { FloorPlanUpload } from '@/features/units/components/floor-plan-upload'
-import { FloorPlanViewer } from '@/features/units/components/floor-plan-viewer'
+import { FloorPlansSection } from '@/features/units/components/floor-plans-section'
 import { getRoomsByUnitId } from '@/features/units/actions/rooms'
 import type { UnitDetail } from '@/features/units/types'
 
@@ -17,20 +17,12 @@ export async function UnitSections({ unit }: { unit: UnitDetail }) {
     (workOrder) => workOrder.unitId === unit.id
   )
   const rooms = await getRoomsByUnitId(unit.id)
+  const canWrite = canWriteProperty(unit.role)
 
   return (
     <>
       <Card className="border border-border">
-        <CardHeader>
-          <p className="text-sm font-medium">Plan de l&apos;appartement</p>
-        </CardHeader>
-        <CardContent>
-          {unit.floorPlanUrl ? (
-            <FloorPlanViewer unit={unit} zones={unit.floorPlanZones ?? []} rooms={rooms} />
-          ) : (
-            <FloorPlanUpload unitId={unit.id} />
-          )}
-        </CardContent>
+        <FloorPlansSection unit={unit} rooms={rooms} canWrite={canWrite} />
       </Card>
 
       <Card className="border border-border">
@@ -43,6 +35,7 @@ export async function UnitSections({ unit }: { unit: UnitDetail }) {
             unitId={unit.id}
             propertySlug={unit.property.slug}
             unitSlug={unit.slug}
+            canWrite={canWrite}
           />
         </CardContent>
       </Card>
@@ -50,25 +43,33 @@ export async function UnitSections({ unit }: { unit: UnitDetail }) {
       <Card className="border border-border">
         <CardHeader className="flex-row items-center justify-between">
           <p className="text-sm font-medium">Documents</p>
-          <AddDocumentButton
-            propertySlug={unit.property.slug}
-            unitSlug={unit.slug}
-            unitId={unit.id}
-            tenantId={activeTenant?.id}
-          />
+          {canWrite && (
+            <AddDocumentButton
+              propertySlug={unit.property.slug}
+              unitSlug={unit.slug}
+              unitId={unit.id}
+              tenantId={activeTenant?.id}
+            />
+          )}
         </CardHeader>
         <CardContent>
-          <DocumentList documents={unit.documents} />
+          <DocumentList documents={unit.documents} canWrite={canWrite} />
         </CardContent>
       </Card>
 
       <Card className="border border-border">
         <CardHeader className="flex-row items-center justify-between">
           <p className="text-sm font-medium">Travaux &amp; Interventions</p>
-          <AddWorkOrderButton unitId={unit.id} />
+          {canWrite && <AddWorkOrderButton unitId={unit.id} />}
         </CardHeader>
         <CardContent>
-          <WorkOrderList workOrders={workOrders} />
+          <WorkOrderList
+            workOrders={workOrders}
+            canWrite={canWrite}
+            propertySlug={unit.property.slug}
+            unitSlug={unit.slug}
+            unitId={unit.id}
+          />
         </CardContent>
       </Card>
     </>

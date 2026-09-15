@@ -128,7 +128,7 @@ function SidebarBrand() {
 
 export function Sidebar() {
   return (
-    <aside className="hidden h-screen shadow-[1px_0_0_0_hsl(var(--border))] lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:overflow-hidden lg:bg-gray-50 dark:lg:bg-gray-950">
+    <aside className="hidden h-full shadow-[1px_0_0_0_hsl(var(--border))] lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:overflow-hidden lg:bg-gray-50 dark:lg:bg-gray-950">
       <SidebarBrand />
       <SidebarNav />
       <Separator className="my-2 shrink-0" />

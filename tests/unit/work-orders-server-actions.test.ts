@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { prisma } from '@/core/lib/db'
 import { auth } from '@/core/lib/auth'
+import { uploadFile } from '@/core/lib/storage'
 import { checkPropertyAccess } from '@/features/members/actions/members'
 import {
+  attachFilesToWorkOrder,
   createWorkOrder,
   deleteWorkOrder,
   updateWorkOrder,
@@ -22,6 +24,8 @@ beforeEach(() => {
   vi.mocked(prisma.workOrder.create).mockReset()
   vi.mocked(prisma.workOrder.update).mockReset()
   vi.mocked(prisma.workOrder.delete).mockReset()
+  vi.mocked(prisma.document.create).mockReset()
+  vi.mocked(uploadFile).mockReset()
 })
 
 describe('createWorkOrder', () => {
@@ -207,5 +211,114 @@ describe('deleteWorkOrder', () => {
     await deleteWorkOrder('wo-1')
 
     expect(prisma.workOrder.delete).toHaveBeenCalledWith({ where: { id: 'wo-1' } })
+  })
+})
+
+describe('attachFilesToWorkOrder', () => {
+  function fakeFile(name: string, type: string, size = 100) {
+    return new File([new Uint8Array(size)], name, { type })
+  }
+
+  function filesFormData(...files: File[]) {
+    const formData = new FormData()
+    for (const file of files) formData.append('files', file)
+    return formData
+  }
+
+  const workOrderWithUnit = {
+    id: 'wo-1',
+    unit: {
+      id: 'unit-1',
+      slug: 'apt-1',
+      propertyId: 'prop-1',
+      property: { slug: 'maison' },
+    },
+    room: null,
+  }
+
+  it('uploads selected files without asking for a name or type', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(fakeSession('user-1') as never)
+    vi.mocked(prisma.workOrder.findUnique).mockResolvedValueOnce(workOrderWithUnit as never)
+    vi.mocked(checkPropertyAccess).mockResolvedValueOnce({
+      hasAccess: true,
+      role: 'editor',
+    })
+    vi.mocked(uploadFile).mockResolvedValueOnce('https://files/devis.pdf')
+    vi.mocked(prisma.document.create).mockResolvedValueOnce({
+      id: 'doc-1',
+      name: 'Devis plomberie',
+      type: 'other',
+    } as never)
+
+    const created = await attachFilesToWorkOrder(
+      'wo-1',
+      filesFormData(fakeFile('Devis plomberie.pdf', 'application/pdf'))
+    )
+
+    expect(created).toHaveLength(1)
+    expect(prisma.document.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        name: 'Devis plomberie',
+        type: 'other',
+        workOrderId: 'wo-1',
+        unitId: 'unit-1',
+        fileType: 'application/pdf',
+        fileSize: 100,
+      }),
+    })
+  })
+
+  it('attaches several files to the same work order', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(fakeSession('user-1') as never)
+    vi.mocked(prisma.workOrder.findUnique).mockResolvedValueOnce(workOrderWithUnit as never)
+    vi.mocked(checkPropertyAccess).mockResolvedValueOnce({
+      hasAccess: true,
+      role: 'editor',
+    })
+    vi.mocked(uploadFile)
+      .mockResolvedValueOnce('https://files/a.pdf')
+      .mockResolvedValueOnce('https://files/b.jpg')
+    vi.mocked(prisma.document.create)
+      .mockResolvedValueOnce({ id: 'doc-1', name: 'a', type: 'other' } as never)
+      .mockResolvedValueOnce({ id: 'doc-2', name: 'b', type: 'other' } as never)
+
+    const created = await attachFilesToWorkOrder(
+      'wo-1',
+      filesFormData(
+        fakeFile('a.pdf', 'application/pdf'),
+        fakeFile('b.jpg', 'image/jpeg')
+      )
+    )
+
+    expect(created).toHaveLength(2)
+    expect(uploadFile).toHaveBeenCalledTimes(2)
+    expect(prisma.document.create).toHaveBeenCalledTimes(2)
+  })
+
+  it('rejects a viewer', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(fakeSession('user-1') as never)
+    vi.mocked(prisma.workOrder.findUnique).mockResolvedValueOnce(workOrderWithUnit as never)
+    vi.mocked(checkPropertyAccess).mockResolvedValueOnce({
+      hasAccess: true,
+      role: 'viewer',
+    })
+
+    await expect(
+      attachFilesToWorkOrder('wo-1', filesFormData(fakeFile('a.pdf', 'application/pdf')))
+    ).rejects.toThrow('Droits insuffisants')
+    expect(uploadFile).not.toHaveBeenCalled()
+  })
+
+  it('throws when no file is selected', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(fakeSession('user-1') as never)
+    vi.mocked(prisma.workOrder.findUnique).mockResolvedValueOnce(workOrderWithUnit as never)
+    vi.mocked(checkPropertyAccess).mockResolvedValueOnce({
+      hasAccess: true,
+      role: 'editor',
+    })
+
+    await expect(attachFilesToWorkOrder('wo-1', new FormData())).rejects.toThrow(
+      'Aucun fichier sélectionné'
+    )
   })
 })

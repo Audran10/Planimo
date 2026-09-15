@@ -107,7 +107,9 @@ model Unit {
   floor          Int?
   surface        Float?
   floorPlanUrl   String?   // URL Supabase Storage du plan uploadé
-  floorPlanZones Json?     // zones détectées par Claude Vision [{ id, name, coordinates }]
+  floorPlanZones Json?     // zones du plan [{ id, name, coordinates, cells }]
+  floorPlanCells Json?     // trame des cellules délimitées par les murs détectés [{ x, y, width, height }]
+  floorPlans     Json?     // étages : [{ id, name, url, zones, cells }]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -152,21 +154,23 @@ model Tenant {
 }
 
 model Document {
-  id         String    @id @default(cuid())
-  unitId     String?
-  roomId     String?
-  tenantId   String?
-  name       String
-  fileUrl    String    // URL Supabase Storage
-  fileType   String    // MIME type
-  fileSize   Int?      // en octets
-  type       String    @default("other") // lease | inventory | invoice | insurance | diagnostic | other
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  unitId       String?
+  roomId       String?
+  tenantId     String?
+  workOrderId  String?
+  name         String
+  fileUrl      String    // URL Supabase Storage
+  fileType     String    // MIME type
+  fileSize     Int?      // en octets
+  type         String    @default("other") // lease | inventory | invoice | insurance | diagnostic | other
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  unit       Unit?     @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  room       Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  tenant     Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  unit         Unit?      @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  room         Room?      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tenant       Tenant?    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workOrder    WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 }
 
 model WorkOrder {
@@ -183,4 +187,5 @@ model WorkOrder {
 
   unit             Unit?     @relation(fields: [unitId], references: [id], onDelete: Cascade)
   room             Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  documents        Document[]
 }

@@ -9,4 +9,14 @@ export interface PropertyMember {
   acceptedAt?: Date | null
 }
 
+export interface PendingInvitation {
+  propertyId: string
+  propertyName: string
+  propertySlug: string
+  propertyAddress: string
+  role: MemberRole
+  invitedAt: Date
+  invitedBy: string
+}
+
 export type { MemberRole }

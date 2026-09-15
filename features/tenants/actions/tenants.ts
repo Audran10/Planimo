@@ -5,6 +5,7 @@ import { auth } from '@/core/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { checkPropertyAccess } from '@/features/members/actions/members'
+import { canWriteProperty } from '@/features/members/lib/permissions'
 import { tenantSchema, tenantUpdateSchema } from '../schemas/tenant.schema'
 import { isTenantActive } from '../lib/tenant-status'
 import type {
@@ -13,16 +14,12 @@ import type {
   TenantWithDocuments,
   UpdateTenantInput,
 } from '../types'
-import type { DocumentType, MemberRole } from '@/core/types'
+import type { DocumentType } from '@/core/types'
 
 async function requireSession() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Non authentifié')
   return session
-}
-
-function canManageTenant(role: MemberRole | 'owner' | null) {
-  return role === 'owner' || role === 'admin' || role === 'editor'
 }
 
 function revalidateTenantPaths() {
@@ -79,7 +76,7 @@ export async function createTenant(unitId: string, input: CreateTenantInput) {
   if (!unit) throw new Error('Appartement introuvable')
 
   const access = await checkPropertyAccess(unit.propertyId, session.user.id)
-  if (!access.hasAccess || !canManageTenant(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour ajouter un locataire')
   }
 
@@ -111,7 +108,7 @@ export async function updateTenant(tenantId: string, input: UpdateTenantInput) {
   if (!tenant) throw new Error('Locataire introuvable')
 
   const access = await checkPropertyAccess(tenant.unit.propertyId, session.user.id)
-  if (!access.hasAccess || !canManageTenant(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants')
   }
 
@@ -137,7 +134,7 @@ export async function deleteTenant(tenantId: string) {
   if (!tenant) throw new Error('Locataire introuvable')
 
   const access = await checkPropertyAccess(tenant.unit.propertyId, session.user.id)
-  if (!access.hasAccess || !canManageTenant(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants')
   }
 

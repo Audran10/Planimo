@@ -17,6 +17,7 @@ import {
 } from '@/core/components/ui/alert-dialog'
 import { deleteUnit } from '@/features/units/actions/units'
 import { UnitFormDialog } from '@/features/units/components/unit-form-dialog'
+import { canAdminProperty, canWriteProperty } from '@/features/members/lib/permissions'
 import type { UnitDetail } from '@/features/units/types'
 import { getUnitLabel } from '@/core/lib/property-labels'
 
@@ -26,9 +27,8 @@ export function UnitDetailActions({ unit }: { unit: UnitDetail }) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  const canEdit =
-    unit.role === 'owner' || unit.role === 'admin' || unit.role === 'editor'
-  const canDelete = unit.role === 'owner' || unit.role === 'admin'
+  const canEdit = canWriteProperty(unit.role)
+  const canDelete = canAdminProperty(unit.role)
   const unitLabel = getUnitLabel(unit.property.type).toLowerCase()
 
   if (!canEdit && !canDelete) return null

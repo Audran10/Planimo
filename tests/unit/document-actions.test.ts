@@ -42,11 +42,20 @@ describe('documentSchema', () => {
     }
   })
 
-  it('rejects a document not attached to a unit, room or tenant', () => {
+  it('rejects a document not attached to a unit, room, tenant or work order', () => {
     const result = documentSchema.safeParse({
       name: 'Document orphelin',
       type: 'other',
     })
     expect(result.success).toBe(false)
+  })
+
+  it('validates a document attached to a work order', () => {
+    const result = documentSchema.safeParse({
+      name: 'Facture plombier',
+      type: 'invoice',
+      workOrderId: 'wo-1',
+    })
+    expect(result.success).toBe(true)
   })
 })

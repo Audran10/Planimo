@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { prisma } from '@/core/lib/db'
 import { auth } from '@/core/lib/auth'
-import { uploadFile } from '@/core/lib/supabase'
+import { uploadFile } from '@/core/lib/storage'
 import { checkPropertyAccess } from '@/features/members/actions/members'
 import {
   createDocument,
@@ -20,6 +20,7 @@ beforeEach(() => {
   vi.mocked(prisma.unit.findUnique).mockReset()
   vi.mocked(prisma.room.findUnique).mockReset()
   vi.mocked(prisma.tenant.findUnique).mockReset()
+  vi.mocked(prisma.workOrder.findUnique).mockReset()
   vi.mocked(prisma.document.findUnique).mockReset()
   vi.mocked(prisma.document.create).mockReset()
   vi.mocked(prisma.document.delete).mockReset()
@@ -95,6 +96,34 @@ describe('createDocument', () => {
     })
 
     expect(prisma.document.create).toHaveBeenCalled()
+  })
+
+  it('resolves the property via workOrderId', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(fakeSession('user-1') as never)
+    vi.mocked(prisma.workOrder.findUnique).mockResolvedValueOnce({
+      unit: { propertyId: 'prop-1' },
+      room: null,
+    } as never)
+    vi.mocked(checkPropertyAccess).mockResolvedValueOnce({
+      hasAccess: true,
+      role: 'editor',
+    })
+    vi.mocked(prisma.document.create).mockResolvedValueOnce({ id: 'doc-1' } as never)
+
+    await createDocument({
+      name: 'Facture plombier',
+      type: 'invoice',
+      workOrderId: 'wo-1',
+      fileUrl: 'https://x/y.pdf',
+      fileType: 'application/pdf',
+      fileSize: 100,
+    })
+
+    expect(prisma.document.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ workOrderId: 'wo-1' }),
+      })
+    )
   })
 
   it('throws when the document is not attached to anything', async () => {

@@ -25,6 +25,19 @@ function createPrismaClient() {
   })
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+function getPrisma() {
+  if (process.env.NODE_ENV === 'production') {
+    return globalForPrisma.prisma ?? createPrismaClient()
+  }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+  // En HMR, un client créé avant `prisma generate` ignore les nouveaux champs
+  // (`floorPlanCells`, etc.) et fait échouer les updates. On le recrée dès
+  // que ce module est réévalué.
+  if (globalForPrisma.prisma) {
+    void globalForPrisma.prisma.$disconnect()
+  }
+  return createPrismaClient()
+}
+
+export const prisma = getPrisma()
+globalForPrisma.prisma = prisma
