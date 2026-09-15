@@ -135,7 +135,7 @@ importers:
         specifier: ^20.10.6
         version: 20.10.6
       sharp:
-        specifier: ^0.35.3
+        specifier: ^0.35.0
         version: 0.35.3(@types/node@20.19.43)
       tailwindcss:
         specifier: ^4
