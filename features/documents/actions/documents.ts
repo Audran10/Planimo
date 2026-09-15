@@ -4,8 +4,9 @@ import { prisma } from '@/core/lib/db'
 import { auth } from '@/core/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { uploadFile, deleteFile } from '@/core/lib/supabase'
+import { deleteFile, extractStoragePath, uploadFile } from '@/core/lib/storage'
 import { checkPropertyAccess } from '@/features/members/actions/members'
+import { canWriteProperty } from '@/features/members/lib/permissions'
 import { documentSchema } from '../schemas/document.schema'
 import {
   MAX_FILE_SIZE,
@@ -13,7 +14,7 @@ import {
   isAllowedContentType,
 } from '../lib/file-validation'
 import type { CreateDocumentInput, DocumentListItem } from '../types'
-import type { DocumentType, MemberRole } from '@/core/types'
+import type { DocumentType } from '@/core/types'
 
 const DOCUMENTS_BUCKET = 'documents'
 
@@ -21,10 +22,6 @@ async function requireSession() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Non authentifié')
   return session
-}
-
-function canManageDocument(role: MemberRole | 'owner' | null) {
-  return role === 'owner' || role === 'admin' || role === 'editor'
 }
 
 function revalidateDocumentPaths() {
@@ -46,6 +43,7 @@ async function resolvePropertyId(target: {
   unitId?: string | null
   roomId?: string | null
   tenantId?: string | null
+  workOrderId?: string | null
 }): Promise<string> {
   if (target.unitId) {
     const unit = await prisma.unit.findUnique({
@@ -74,14 +72,22 @@ async function resolvePropertyId(target: {
     return tenant.unit.propertyId
   }
 
-  throw new Error('Document non rattaché à un bien')
-}
+  if (target.workOrderId) {
+    const workOrder = await prisma.workOrder.findUnique({
+      where: { id: target.workOrderId },
+      select: {
+        unit: { select: { propertyId: true } },
+        room: { select: { unit: { select: { propertyId: true } } } },
+      },
+    })
+    if (!workOrder) throw new Error('Intervention introuvable')
+    const propertyId =
+      workOrder.unit?.propertyId ?? workOrder.room?.unit.propertyId
+    if (!propertyId) throw new Error('Intervention non rattachée à un bien')
+    return propertyId
+  }
 
-function extractStoragePath(fileUrl: string, bucket: string): string | null {
-  const marker = `/object/public/${bucket}/`
-  const index = fileUrl.indexOf(marker)
-  if (index === -1) return null
-  return decodeURIComponent(fileUrl.slice(index + marker.length))
+  throw new Error('Document non rattaché à un bien')
 }
 
 export async function getDocumentsByUnitId(unitId: string) {
@@ -147,11 +153,17 @@ export async function getDocumentsByTenantId(tenantId: string) {
 export async function createDocument(input: CreateDocumentInput) {
   const session = await requireSession()
 
-  const { name, type, unitId, roomId, tenantId } = documentSchema.parse(input)
+  const { name, type, unitId, roomId, tenantId, workOrderId } =
+    documentSchema.parse(input)
 
-  const propertyId = await resolvePropertyId({ unitId, roomId, tenantId })
+  const propertyId = await resolvePropertyId({
+    unitId,
+    roomId,
+    tenantId,
+    workOrderId,
+  })
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageDocument(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour ajouter un document')
   }
 
@@ -162,6 +174,7 @@ export async function createDocument(input: CreateDocumentInput) {
       unitId,
       roomId,
       tenantId,
+      workOrderId,
       fileUrl: input.fileUrl,
       fileType: input.fileType,
       fileSize: input.fileSize,
@@ -181,7 +194,7 @@ export async function deleteDocument(documentId: string) {
 
   const propertyId = await resolvePropertyId(document)
   const access = await checkPropertyAccess(propertyId, session.user.id)
-  if (!access.hasAccess || !canManageDocument(access.role)) {
+  if (!access.hasAccess || !canWriteProperty(access.role)) {
     throw new Error('Droits insuffisants pour supprimer ce document')
   }
 
@@ -191,7 +204,7 @@ export async function deleteDocument(documentId: string) {
       await deleteFile(DOCUMENTS_BUCKET, path)
     } catch (error) {
       console.error(
-        'Erreur lors de la suppression du fichier sur Supabase Storage',
+        'Erreur lors de la suppression du fichier',
         error
       )
     }
@@ -212,6 +225,8 @@ export async function getAllDocuments(): Promise<DocumentListItem[]> {
         { unit: { property: filter } },
         { room: { unit: { property: filter } } },
         { tenant: { unit: { property: filter } } },
+        { workOrder: { unit: { property: filter } } },
+        { workOrder: { room: { unit: { property: filter } } } },
       ],
     },
     include: {
@@ -244,12 +259,40 @@ export async function getAllDocuments(): Promise<DocumentListItem[]> {
           },
         },
       },
+      workOrder: {
+        select: {
+          unit: {
+            select: {
+              name: true,
+              slug: true,
+              property: { select: { name: true, slug: true } },
+            },
+          },
+          room: {
+            select: {
+              unit: {
+                select: {
+                  name: true,
+                  slug: true,
+                  property: { select: { name: true, slug: true } },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   })
 
-  return documents.map(({ unit, room, tenant, type, ...doc }) => {
-    const resolvedUnit = unit ?? room?.unit ?? tenant?.unit ?? null
+  return documents.map(({ unit, room, tenant, workOrder, type, ...doc }) => {
+    const resolvedUnit =
+      unit ??
+      room?.unit ??
+      tenant?.unit ??
+      workOrder?.unit ??
+      workOrder?.room?.unit ??
+      null
 
     return {
       ...doc,

@@ -44,7 +44,13 @@ async function convertPdfToImage(file: File): Promise<File> {
   return new File([blob], `${baseName}.png`, { type: 'image/png' })
 }
 
-export function FloorPlanUpload({ unitId }: { unitId: string }) {
+export function FloorPlanUpload({
+  unitId,
+  planId,
+}: {
+  unitId: string
+  planId?: string
+}) {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragActive, setDragActive] = useState(false)
@@ -78,7 +84,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
       const formData = new FormData()
       formData.append('file', fileToUpload)
 
-      const uploaded = await uploadFloorPlan(unitId, formData)
+      const uploaded = await uploadFloorPlan(unitId, formData, planId)
       setUploadedUrl(uploaded.url)
       setStage('uploaded')
     } catch (err) {
@@ -98,7 +104,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
     setStage('analyzing')
     setError(null)
     try {
-      const analyzed = await segmentFloorPlan(unitId, uploadedUrl)
+      const analyzed = await segmentFloorPlan(unitId, uploadedUrl, planId)
       setResult({ roomsCount: analyzed.zones.length, confidence: analyzed.confidence })
       setStage('analyzed')
       window.location.reload()
@@ -115,7 +121,7 @@ export function FloorPlanUpload({ unitId }: { unitId: string }) {
 
   async function handleDelete() {
     try {
-      await deleteFloorPlan(unitId)
+      await deleteFloorPlan(unitId, planId)
       toast.success('Plan supprimé')
       setStage('idle')
       setUploadedUrl(null)

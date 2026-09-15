@@ -1,6 +1,7 @@
-import type { FloorPlanZone, PropertyType } from '@/core/types'
+import type { FloorPlanCell, FloorPlanZone, PropertyType } from '@/core/types'
 import type { PropertyRole } from '@/features/properties/types'
 import type { Document } from '@/features/documents/types'
+import type { StoredFloorPlan } from '@/features/units/lib/floor-plans'
 
 export interface Unit {
   id: string
@@ -11,6 +12,10 @@ export interface Unit {
   surface?: number | null
   floorPlanUrl?: string | null
   floorPlanZones?: FloorPlanZone[] | null
+  /** Trame des cellules délimitées par les murs, base de l'édition par clic. */
+  floorPlanCells?: FloorPlanCell[] | null
+  /** Étages d'une maison (ou plans additionnels). */
+  floorPlans?: StoredFloorPlan[] | null
   createdAt: Date
   updatedAt: Date
 }

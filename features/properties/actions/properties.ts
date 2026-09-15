@@ -13,6 +13,7 @@ import type {
   PropertyWithMeta,
   UpdatePropertyInput,
 } from '../types'
+import { canAdminProperty, getPropertyActorRole } from '@/features/members/lib/permissions'
 import type { FloorPlanZone, MemberRole, PropertyType } from '@/core/types'
 import type { Unit } from '@/features/units/types'
 
@@ -155,14 +156,12 @@ export async function updateProperty(id: string, input: UpdatePropertyInput) {
   })
   if (!property) throw new Error('Bien introuvable')
 
-  const isOwner = property.ownerId === session.user.id
-  const isAdmin = property.members.some(
-    (member) =>
-      member.userId === session.user.id &&
-      member.acceptedAt &&
-      member.role === 'admin'
+  const actorRole = getPropertyActorRole(
+    property.ownerId,
+    property.members,
+    session.user.id
   )
-  if (!isOwner && !isAdmin) throw new Error('Action non autorisée')
+  if (!canAdminProperty(actorRole)) throw new Error('Action non autorisée')
 
   let slug = property.slug
   if (data.name && data.name !== property.name) {

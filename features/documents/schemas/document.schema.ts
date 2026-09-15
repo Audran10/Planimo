@@ -10,10 +10,15 @@ export const documentSchema = z
     unitId: z.string().optional(),
     roomId: z.string().optional(),
     tenantId: z.string().optional(),
+    workOrderId: z.string().optional(),
   })
-  .refine((data) => Boolean(data.unitId || data.roomId || data.tenantId), {
-    error: 'Un document doit être rattaché à un appartement, une pièce ou un locataire.',
-    path: ['unitId'],
-  })
+  .refine(
+    (data) => Boolean(data.unitId || data.roomId || data.tenantId || data.workOrderId),
+    {
+      error:
+        'Un document doit être rattaché à un appartement, une pièce, un locataire ou une intervention.',
+      path: ['unitId'],
+    }
+  )
 
 export type DocumentFormValues = z.infer<typeof documentSchema>

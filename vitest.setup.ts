@@ -49,6 +49,10 @@ vi.mock('@/core/lib/db', () => ({
       findUnique: vi.fn(),
     },
     propertyMember: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
       upsert: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -77,8 +81,13 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }))
 
-// Mock Supabase Storage — jamais d'appel réseau pendant les tests.
-vi.mock('@/core/lib/supabase', () => ({
-  uploadFile: vi.fn(),
-  deleteFile: vi.fn(),
-}))
+// Mock Storage — jamais d'appel disque/réseau pendant les tests.
+vi.mock('@/core/lib/storage', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/core/lib/storage')>()
+  return {
+    ...actual,
+    uploadFile: vi.fn(),
+    deleteFile: vi.fn(),
+    readStoredFile: vi.fn(),
+  }
+})

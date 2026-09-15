@@ -17,6 +17,7 @@ import {
 } from '@/core/components/ui/alert-dialog'
 import { deleteProperty } from '@/features/properties/actions/properties'
 import { PropertyFormDialog } from '@/features/properties/components/property-form-dialog'
+import { canAdminProperty, canOwnProperty } from '@/features/members/lib/permissions'
 import type { PropertyDetail } from '@/features/properties/types'
 
 export function PropertyDetailActions({
@@ -29,8 +30,8 @@ export function PropertyDetailActions({
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  const canEdit = property.role === 'owner' || property.role === 'admin'
-  const canDelete = property.role === 'owner'
+  const canEdit = canAdminProperty(property.role)
+  const canDelete = canOwnProperty(property.role)
 
   if (!canEdit && !canDelete) return null
 

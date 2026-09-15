@@ -25,6 +25,7 @@ interface TenantSectionProps {
   unitId: string
   propertySlug: string
   unitSlug: string
+  canWrite?: boolean
 }
 
 export function TenantSection({
@@ -32,6 +33,7 @@ export function TenantSection({
   unitId,
   propertySlug,
   unitSlug,
+  canWrite = false,
 }: TenantSectionProps) {
   const [createOpen, setCreateOpen] = useState(false)
 
@@ -42,7 +44,17 @@ export function TenantSection({
         unitId={unitId}
         propertySlug={propertySlug}
         unitSlug={unitSlug}
+        canWrite={canWrite}
       />
+    )
+  }
+
+  if (!canWrite) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+        <UserX className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+        <p className="text-sm text-muted-foreground">Aucun locataire</p>
+      </div>
     )
   }
 

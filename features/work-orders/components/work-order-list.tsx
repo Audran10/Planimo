@@ -4,7 +4,19 @@ import type { WorkOrder } from '@/features/work-orders/types'
 
 const amountFormatter = new Intl.NumberFormat('fr-FR')
 
-export function WorkOrderList({ workOrders }: { workOrders: WorkOrder[] }) {
+export function WorkOrderList({
+  workOrders,
+  canWrite = false,
+  propertySlug,
+  unitSlug,
+  unitId,
+}: {
+  workOrders: WorkOrder[]
+  canWrite?: boolean
+  propertySlug?: string
+  unitSlug?: string
+  unitId?: string
+}) {
   if (workOrders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
@@ -23,7 +35,14 @@ export function WorkOrderList({ workOrders }: { workOrders: WorkOrder[] }) {
   return (
     <div className="space-y-3">
       {workOrders.map((workOrder) => (
-        <WorkOrderCard key={workOrder.id} workOrder={workOrder} />
+        <WorkOrderCard
+          key={workOrder.id}
+          workOrder={workOrder}
+          canWrite={canWrite}
+          propertySlug={propertySlug}
+          unitSlug={unitSlug}
+          unitId={unitId}
+        />
       ))}
       <p className="border-t border-border pt-3 text-right text-sm font-medium">
         Total travaux : {amountFormatter.format(total)} €

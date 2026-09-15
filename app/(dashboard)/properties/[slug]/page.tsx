@@ -8,20 +8,19 @@ import { UnitCard } from '@/features/units/components/unit-card'
 import { UnitSections } from '@/features/units/components/unit-sections'
 import { AddUnitButton } from '@/features/units/components/add-unit-button'
 import { InviteMemberButton } from '@/features/members/components/invite-member-button'
+import { MemberRoleSelect } from '@/features/members/components/member-role-select'
 import { RemoveMemberButton } from '@/features/members/components/remove-member-button'
 import { SetBreadcrumb } from '@/features/dashboard/components/set-breadcrumb'
 import { getUnitLabel } from '@/core/lib/property-labels'
 import { Badge } from '@/core/components/ui/badge'
 import { Card, CardContent } from '@/core/components/ui/card'
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar'
-import type { PropertyRole } from '@/features/properties/types'
-
-const roleLabels: Record<PropertyRole, string> = {
-  owner: 'Propriétaire',
-  admin: 'Administrateur',
-  editor: 'Éditeur',
-  viewer: 'Lecteur',
-}
+import { PROPERTY_ROLE_LABELS } from '@/features/members/constants'
+import {
+  canAdminProperty,
+  canRemoveMember,
+  canWriteProperty,
+} from '@/features/members/lib/permissions'
 
 function getInitials(name?: string | null) {
   if (!name) return '?'
@@ -57,7 +56,8 @@ export default async function PropertyDetailPage({
   const units = isHouse ? [] : await getUnitsByPropertyId(property.id)
 
   const Icon = propertyTypeIcons[property.type]
-  const canManageMembers = property.role === 'owner' || property.role === 'admin'
+  const canManageMembers = canAdminProperty(property.role)
+  const canWrite = canWriteProperty(property.role)
   const unitLabelPlural = getUnitLabel(property.type, true)
 
   return (
@@ -75,7 +75,7 @@ export default async function PropertyDetailPage({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold">{property.name}</h1>
               <Badge variant={property.role === 'owner' ? 'default' : 'outline'}>
-                {roleLabels[property.role]}
+                {PROPERTY_ROLE_LABELS[property.role]}
               </Badge>
             </div>
             <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
@@ -101,11 +101,13 @@ export default async function PropertyDetailPage({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">{unitLabelPlural}</h2>
-            <AddUnitButton
-              propertyId={property.id}
-              propertySlug={property.slug}
-              propertyType={property.type}
-            />
+            {canWrite && (
+              <AddUnitButton
+                propertyId={property.id}
+                propertySlug={property.slug}
+                propertyType={property.type}
+              />
+            )}
           </div>
 
           {units.length === 0 ? (
@@ -115,11 +117,13 @@ export default async function PropertyDetailPage({
                 <p className="text-sm text-muted-foreground">
                   Aucun {getUnitLabel(property.type).toLowerCase()} pour le moment
                 </p>
-                <AddUnitButton
-                  propertyId={property.id}
-                  propertySlug={property.slug}
-                  propertyType={property.type}
-                />
+                {canWrite && (
+                  <AddUnitButton
+                    propertyId={property.id}
+                    propertySlug={property.slug}
+                    propertyType={property.type}
+                  />
+                )}
               </CardContent>
             </Card>
           ) : (
@@ -141,7 +145,12 @@ export default async function PropertyDetailPage({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Membres</h2>
-          {canManageMembers && <InviteMemberButton propertyId={property.id} />}
+          {canManageMembers && (
+            <InviteMemberButton
+              propertyId={property.id}
+              actorRole={property.role}
+            />
+          )}
         </div>
 
         <Card className="border border-border">
@@ -186,8 +195,19 @@ export default async function PropertyDetailPage({
                   {!member.acceptedAt && (
                     <Badge variant="outline">En attente</Badge>
                   )}
-                  <Badge variant="secondary">{roleLabels[member.role]}</Badge>
-                  {canManageMembers && (
+                  {canManageMembers ? (
+                    <MemberRoleSelect
+                      propertyId={property.id}
+                      userId={member.userId}
+                      currentRole={member.role}
+                      actorRole={property.role}
+                    />
+                  ) : (
+                    <Badge variant="secondary">
+                      {PROPERTY_ROLE_LABELS[member.role]}
+                    </Badge>
+                  )}
+                  {canRemoveMember(property.role, member.role) && (
                     <RemoveMemberButton
                       propertyId={property.id}
                       userId={member.userId}
