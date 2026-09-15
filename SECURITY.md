@@ -39,6 +39,10 @@ Les headers `x-forwarded-host` et `x-host` sont comparés au header `host` réel
 
 Better Auth est configuré avec `httpOnly: true`, `sameSite: 'lax'` et `secure` activé en production — protection CSRF native via les cookies.
 
+### Row Level Security (Supabase)
+
+Les tables du schéma `public` ont le RLS activé, sans policy, et les droits `anon` / `authenticated` sont révoqués. L'API REST Supabase (clé publique) ne peut rien lire ni écrire. L'application continue d'accéder à Postgres via Prisma, en rôle propriétaire, qui n'est pas soumis au RLS.
+
 ### Upload de fichiers (`features/documents/actions/documents.ts`)
 
 `uploadDocumentFile` valide côté serveur (jamais seulement côté client) :
