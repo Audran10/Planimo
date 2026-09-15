@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Building2, Euro, FileText, MoreVertical, Pencil, Trash2, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
@@ -67,11 +67,14 @@ export function WorkOrderCard({
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
-  const [documents, setDocuments] = useState<Document[]>(workOrder.documents ?? [])
-
-  useEffect(() => {
-    setDocuments(workOrder.documents ?? [])
-  }, [workOrder.documents])
+  const [addedDocuments, setAddedDocuments] = useState<Document[]>([])
+  const [removedDocumentIds, setRemovedDocumentIds] = useState<string[]>([])
+  const serverDocuments = workOrder.documents ?? []
+  const serverIds = new Set(serverDocuments.map((document) => document.id))
+  const documents = [
+    ...addedDocuments.filter((document) => !serverIds.has(document.id)),
+    ...serverDocuments.filter((document) => !removedDocumentIds.includes(document.id)),
+  ]
 
   async function handleDelete() {
     setDeleting(true)
@@ -191,7 +194,7 @@ export function WorkOrderCard({
                     <AttachWorkOrderFilesButton
                       workOrderId={workOrder.id}
                       onAttached={(added) => {
-                        setDocuments((current) => [...added, ...current])
+                        setAddedDocuments((current) => [...added, ...current])
                         onDocumentsChange?.()
                         router.refresh()
                       }}
@@ -203,9 +206,7 @@ export function WorkOrderCard({
                     documents={documents}
                     canWrite={canWrite}
                     onDeleted={(documentId) => {
-                      setDocuments((current) =>
-                        current.filter((document) => document.id !== documentId)
-                      )
+                      setRemovedDocumentIds((current) => [...current, documentId])
                       onDocumentsChange?.()
                     }}
                   />

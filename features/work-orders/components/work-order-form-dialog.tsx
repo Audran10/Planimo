@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -103,13 +103,15 @@ export function WorkOrderFormDialog({
     defaultValues: defaultValuesFor(workOrder, unitId, roomId),
   })
 
-  useEffect(() => {
+  const formResetKey = `${open}:${workOrder?.id ?? 'new'}:${unitId ?? ''}:${roomId ?? ''}`
+  const [seenFormResetKey, setSeenFormResetKey] = useState(formResetKey)
+  if (formResetKey !== seenFormResetKey) {
+    setSeenFormResetKey(formResetKey)
     if (open) {
       form.reset(defaultValuesFor(workOrder, unitId, roomId))
       setFiles([])
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
-  }, [open, workOrder, unitId, roomId, form])
+  }
 
   // Clear the error banner on close (an event, not a render-time sync) so a
   // stale error never reappears the next time the dialog is opened.
@@ -316,6 +318,7 @@ export function WorkOrderFormDialog({
             <div className="space-y-2">
               <FormLabel>Documents</FormLabel>
               <input
+                key={formResetKey}
                 ref={fileInputRef}
                 type="file"
                 accept="application/pdf,image/*"

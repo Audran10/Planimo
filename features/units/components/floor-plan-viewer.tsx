@@ -132,11 +132,6 @@ export function FloorPlanViewer({
   }
 
   function labelForZone(zone: FloorPlanZone) {
-    // Tant que le refresh n'a pas rattrapé la dernière mutation, les `rooms`
-    // serveur sont encore l'ancienne génération (analyse IA).
-    if (pendingServerSnapshot.current) {
-      return zone.name ?? 'Pièce sans nom'
-    }
     return findRoomForZone(zone.id)?.name ?? zone.name ?? 'Pièce sans nom'
   }
 

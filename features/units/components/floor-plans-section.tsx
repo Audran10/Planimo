@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,19 +26,13 @@ export function FloorPlansSection({
   const router = useRouter()
   const isHouse = unit.property.type === 'house'
   const plans = listFloorPlans(unit)
-  const [activeId, setActiveId] = useState(plans[0]?.id ?? '')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
 
-  useEffect(() => {
-    if (plans.length === 0) {
-      setActiveId('')
-      return
-    }
-    if (!plans.some((plan) => plan.id === activeId)) {
-      setActiveId(plans[0].id)
-    }
-  }, [plans, activeId])
-
+  const activeId =
+    selectedId && plans.some((plan) => plan.id === selectedId)
+      ? selectedId
+      : (plans[0]?.id ?? '')
   const active = plans.find((plan) => plan.id === activeId) ?? plans[0]
   const title = getFloorPlanLabel(unit.property.type, plans.length > 1)
 
@@ -46,7 +40,7 @@ export function FloorPlansSection({
     setAdding(true)
     try {
       const created = await addFloorPlan(unit.id)
-      setActiveId(created.id)
+      setSelectedId(created.id)
       toast.success(`${created.name} ajouté`)
       router.refresh()
     } catch (error) {
@@ -90,7 +84,7 @@ export function FloorPlansSection({
                     ? 'border-primary bg-primary/10 font-medium text-primary'
                     : 'border-border text-muted-foreground hover:bg-muted'
                 )}
-                onClick={() => setActiveId(plan.id)}
+                onClick={() => setSelectedId(plan.id)}
               >
                 {plan.name}
               </button>
