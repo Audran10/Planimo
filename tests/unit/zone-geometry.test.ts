@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   cellsOutline,
   cellsShareEdge,
+  clipCellsToBox,
   labelAnchor,
+  resizeBox,
+  resizeCellZone,
   withCells,
   zoneBox,
   zoneOfCell,
@@ -123,5 +126,48 @@ describe('cellsShareEdge', () => {
         { x: 10, y: 10, width: 10, height: 10 }
       )
     ).toBe(false)
+  })
+})
+
+describe('clipCellsToBox', () => {
+  it('clips a single open-plan cell so kitchen and living can be split', () => {
+    const open = { x: 0, y: 0, width: 40, height: 20 }
+
+    expect(clipCellsToBox([open], { left: 0, top: 0, width: 20, height: 20 })).toEqual([
+      { x: 0, y: 0, width: 20, height: 20 },
+    ])
+  })
+
+  it('drops cells that no longer overlap the box', () => {
+    const salon = { x: 0, y: 0, width: 20, height: 20 }
+    const cuisine = { x: 20, y: 0, width: 20, height: 20 }
+
+    expect(clipCellsToBox([salon, cuisine], { left: 0, top: 0, width: 20, height: 20 })).toEqual([
+      salon,
+    ])
+  })
+})
+
+describe('resizeBox', () => {
+  it('shrinks from the south-east corner', () => {
+    expect(
+      resizeBox({ left: 10, top: 10, width: 40, height: 30 }, 'se', -10, -5)
+    ).toEqual({ left: 10, top: 10, width: 30, height: 25 })
+  })
+})
+
+describe('resizeCellZone', () => {
+  it('cuts an open-plan cell down to the new rectangle', () => {
+    const open = { x: 0, y: 0, width: 40, height: 20 }
+    const zone: FloorPlanZone = {
+      id: 'open',
+      name: 'Séjour',
+      coordinates: { x: 20, y: 10, width: 40, height: 20 },
+      cells: [open],
+    }
+
+    const resized = resizeCellZone(zone, { left: 0, top: 0, width: 20, height: 20 })
+
+    expect(resized.cells).toEqual([{ x: 0, y: 0, width: 20, height: 20 }])
   })
 })
