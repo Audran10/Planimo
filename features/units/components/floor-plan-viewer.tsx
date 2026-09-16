@@ -14,6 +14,8 @@ import { RoomDetailPanel } from '@/features/units/components/room-detail-panel'
 import {
   cellsOutline,
   labelAnchor,
+  resizeBox,
+  resizeCellZone,
   sameCell,
   withCells,
   zoneBox,
@@ -41,6 +43,7 @@ interface DragState {
   startX: number
   startY: number
   original?: FloorPlanZone
+  originalBox?: { left: number; top: number; width: number; height: number }
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -273,9 +276,9 @@ export function FloorPlanViewer({
     zone: FloorPlanZone,
     handle: HandlePosition
   ) {
-    if (addingRoom) return
     event.stopPropagation()
     event.preventDefault()
+    if (addingRoom) return
     capturePointer(event)
     const { x, y } = percentFromEvent(event)
     dragState.current = {
@@ -285,11 +288,12 @@ export function FloorPlanViewer({
       startX: x,
       startY: y,
       original: zone,
+      originalBox: zoneBox(zone),
     }
   }
 
   function handleBackgroundPointerDown(event: ReactPointerEvent) {
-    if (!editMode || !addingRoom || hasGrid) return
+    if (!editMode || !addingRoom) return
     event.preventDefault()
     capturePointer(event)
     const { x, y } = percentFromEvent(event)
@@ -331,37 +335,46 @@ export function FloorPlanViewer({
     if (drag.type === 'resize' && drag.original && drag.handle) {
       const dx = x - drag.startX
       const dy = y - drag.startY
-      const { width: ow, height: oh } = drag.original.coordinates
-      let widthDelta = 0
-      let heightDelta = 0
-      if (drag.handle === 'se') {
-        widthDelta = dx * 2
-        heightDelta = dy * 2
-      } else if (drag.handle === 'nw') {
-        widthDelta = -dx * 2
-        heightDelta = -dy * 2
-      } else if (drag.handle === 'ne') {
-        widthDelta = dx * 2
-        heightDelta = -dy * 2
-      } else if (drag.handle === 'sw') {
-        widthDelta = -dx * 2
-        heightDelta = dy * 2
-      }
 
-      setZones((current) =>
-        current.map((zone) =>
-          zone.id === drag.zoneId
-            ? {
-                ...zone,
-                coordinates: {
-                  ...zone.coordinates,
-                  width: clamp(ow + widthDelta, 4, 100),
-                  height: clamp(oh + heightDelta, 4, 100),
-                },
-              }
-            : zone
+      if (drag.original.cells && drag.originalBox) {
+        const nextBox = resizeBox(drag.originalBox, drag.handle, dx, dy)
+        const source = drag.original
+        setZones((current) =>
+          current.map((zone) => (zone.id === drag.zoneId ? resizeCellZone(source, nextBox) : zone))
         )
-      )
+      } else {
+        const { width: ow, height: oh } = drag.original.coordinates
+        let widthDelta = 0
+        let heightDelta = 0
+        if (drag.handle === 'se') {
+          widthDelta = dx * 2
+          heightDelta = dy * 2
+        } else if (drag.handle === 'nw') {
+          widthDelta = -dx * 2
+          heightDelta = -dy * 2
+        } else if (drag.handle === 'ne') {
+          widthDelta = dx * 2
+          heightDelta = -dy * 2
+        } else if (drag.handle === 'sw') {
+          widthDelta = -dx * 2
+          heightDelta = dy * 2
+        }
+
+        setZones((current) =>
+          current.map((zone) =>
+            zone.id === drag.zoneId
+              ? {
+                  ...zone,
+                  coordinates: {
+                    ...zone.coordinates,
+                    width: clamp(ow + widthDelta, 4, 100),
+                    height: clamp(oh + heightDelta, 4, 100),
+                  },
+                }
+              : zone
+          )
+        )
+      }
     }
 
     if (drag.type === 'create') {
@@ -685,28 +698,6 @@ export function FloorPlanViewer({
                     </div>
                   </foreignObject>
                 )}
-                {editMode && width > 0 && height > 0 && (
-                  <>
-                    {!zone.cells &&
-                      HANDLES.map((handle) => {
-                        const hx = handle.includes('w') ? x : x + width
-                        const hy = handle.includes('n') ? y : y + height
-                        return (
-                          <circle
-                            key={handle}
-                            cx={hx}
-                            cy={hy}
-                            r={5}
-                            fill={color.stroke}
-                            className="cursor-nwse-resize"
-                            onPointerDown={(event) =>
-                              handleHandlePointerDown(event, zone, handle)
-                            }
-                          />
-                        )
-                      })}
-                  </>
-                )}
               </g>
             )
           })}
@@ -729,7 +720,7 @@ export function FloorPlanViewer({
                   stroke={isTarget ? '#0f172a' : '#64748b'}
                   strokeWidth={isTarget ? 2 : 1}
                   strokeDasharray="4 3"
-                  className="cursor-pointer"
+                  className="pointer-events-none cursor-pointer"
                   onPointerDown={(event) => {
                     event.stopPropagation()
                     handleCellClick(cell)
@@ -743,6 +734,44 @@ export function FloorPlanViewer({
                         : 'Cellule libre — cliquez pour l’ajouter à la pièce sélectionnée'}
                   </title>
                 </rect>
+              )
+            })}
+
+          {editMode &&
+            zones.map((zone) => {
+              const box = zoneBox(zone)
+              if (box.width <= 0 || box.height <= 0) return null
+              const hx0 = toPxX(box.left)
+              const hy0 = toPxY(box.top)
+              const hx1 = toPxX(box.left + box.width)
+              const hy1 = toPxY(box.top + box.height)
+              const color = zoneColors.get(zone.id) ?? { stroke: '#64748b', fill: '' }
+              return (
+                <g key={`handles-${zone.id}`}>
+                  {HANDLES.map((handle) => {
+                    const cx = handle.includes('w') ? hx0 : hx1
+                    const cy = handle.includes('n') ? hy0 : hy1
+                    return (
+                      <g
+                        key={handle}
+                        className="cursor-nwse-resize"
+                        onPointerDown={(event) =>
+                          handleHandlePointerDown(event, zone, handle)
+                        }
+                      >
+                        <circle cx={cx} cy={cy} r={16} fill="transparent" />
+                        <circle
+                          cx={cx}
+                          cy={cy}
+                          r={7}
+                          fill={color.stroke}
+                          stroke="white"
+                          strokeWidth={2}
+                        />
+                      </g>
+                    )
+                  })}
+                </g>
               )
             })}
 
@@ -787,10 +816,8 @@ export function FloorPlanViewer({
         <p className="text-xs text-muted-foreground">
           {hasGrid
             ? addingRoom
-              ? 'Cliquez une cellule pour créer une nouvelle pièce.'
-              : selectedZoneId
-                ? 'Cliquez une cellule pour l’ajouter à la pièce sélectionnée, ou de nouveau pour la retirer. Recliquez « Ajouter une pièce » pour en créer une autre.'
-                : 'Les pointillés suivent les murs détectés. Cliquez une pièce pour la sélectionner, puis cliquez les cellules à lui ajouter ou retirer.'
+              ? 'Cliquez-glissez pour dessiner la nouvelle pièce (cuisine, etc.) sur la zone libérée.'
+              : 'Tirez un coin pour réduire une pièce trop large, puis « Ajouter une pièce » pour tracer celle qui reste.'
             : addingRoom
               ? 'Cliquez-glissez sur le plan pour dessiner une pièce. Vous pouvez en dessiner plusieurs à la suite, puis recliquer « Ajouter une pièce » pour quitter le mode ajout.'
               : 'Faites glisser une pièce pour la déplacer, ou tirez depuis un coin pour la redimensionner. Activez « Ajouter une pièce » puis cliquez-glissez sur le plan pour dessiner une nouvelle zone.'}

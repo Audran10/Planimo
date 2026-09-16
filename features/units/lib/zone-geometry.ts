@@ -160,6 +160,81 @@ export function zoneOfCell(
   return zones.find((zone) => zone.cells?.some((member) => sameCell(member, cell)))
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+export function clipCellToBox(cell: FloorPlanCell, box: Box): FloorPlanCell | null {
+  const left = Math.max(cell.x, box.left)
+  const top = Math.max(cell.y, box.top)
+  const right = Math.min(cell.x + cell.width, box.left + box.width)
+  const bottom = Math.min(cell.y + cell.height, box.top + box.height)
+  const width = right - left
+  const height = bottom - top
+  if (width <= EPSILON || height <= EPSILON) return null
+  return { x: left, y: top, width, height }
+}
+
+export function clipCellsToBox(cells: FloorPlanCell[], box: Box): FloorPlanCell[] {
+  return cells
+    .map((cell) => clipCellToBox(cell, box))
+    .filter((cell): cell is FloorPlanCell => cell !== null)
+}
+
+export function resizeBox(
+  box: Box,
+  handle: 'nw' | 'ne' | 'sw' | 'se',
+  dx: number,
+  dy: number
+): Box {
+  let { left, top, width, height } = box
+  const min = 2
+  if (handle.includes('e')) {
+    width = clamp(width + dx, min, 100 - left)
+  }
+  if (handle.includes('s')) {
+    height = clamp(height + dy, min, 100 - top)
+  }
+  if (handle.includes('w')) {
+    const nextWidth = clamp(width - dx, min, left + width)
+    left += width - nextWidth
+    width = nextWidth
+  }
+  if (handle.includes('n')) {
+    const nextHeight = clamp(height - dy, min, top + height)
+    top += height - nextHeight
+    height = nextHeight
+  }
+  return {
+    left: clamp(left, 0, 100),
+    top: clamp(top, 0, 100),
+    width,
+    height,
+  }
+}
+
+/**
+ * Découpe la pièce sur le rectangle (y compris une unique grande cellule
+ * cuisine+salon). Toujours partir des cellules d'origine, pas de l'état déjà
+ * réduit, pour pouvoir agrandir à nouveau pendant le drag.
+ */
+export function resizeCellZone(zone: FloorPlanZone, box: Box): FloorPlanZone {
+  const clipped = clipCellsToBox(zone.cells ?? [], box)
+  if (clipped.length === 0) {
+    return {
+      ...zone,
+      cells: undefined,
+      coordinates: {
+        x: box.left + box.width / 2,
+        y: box.top + box.height / 2,
+        width: box.width,
+        height: box.height,
+      },
+    }
+  }
+  return withCells(zone, clipped)
+}
+
 /** Recalcule la boîte englobante après un ajout ou un retrait de cellule. */
 export function withCells(zone: FloorPlanZone, cells: FloorPlanCell[]): FloorPlanZone {
   // Une pièce en cours de composition n'a encore aucune cellule : sa boîte
